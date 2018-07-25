@@ -1,0 +1,11 @@
+{
+    "version": 1,
+    "storageDriverName": "ontap-san",
+    "managementLIF": "10.195.50.131",
+    "dataLIF": "10.195.50.131",
+    "svm": "FILE_SERV_Update",
+    "igroupName": "trident",
+    "username": "vsadmin",
+    "password": "Netapp123"
+    
+}
