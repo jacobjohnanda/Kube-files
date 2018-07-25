@@ -1,0 +1,194 @@
+login as: root
+root@rhel3.demo.netapp.com's password:
+Last login: Wed Jun 13 06:12:56 2018 from jumphost.demo.netapp.com
+[root@rhel3 ~]#
+[root@rhel3 ~]#
+[root@rhel3 ~]# kubectl get sc
+NAME                        PROVISIONER         AGE
+storage-class-nas           netapp.io/trident   3d
+storage-class-solidfire     netapp.io/trident   3d
+storage-class-ssd           netapp.io/trident   3d
+storage-class-storagepool   netapp.io/trident   3d
+[root@rhel3 ~]# kubectl describe sc storage-class-storagepool
+Name:                  storage-class-storagepool
+IsDefaultClass:        No
+Annotations:           <none>
+Provisioner:           netapp.io/trident
+Parameters:            storagePools=BackendForNAS:aggr1
+AllowVolumeExpansion:  <unset>
+MountOptions:          <none>
+ReclaimPolicy:         Delete
+VolumeBindingMode:     Immediate
+Events:                <none>
+[root@rhel3 ~]# cat  k8s/pvcforstoragepool.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: persistent-volume-claim-storagepool
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: storage-class-storagepool
+[root@rhel3 ~]# kubectl create -f k8s/pvcforstoragepool.yaml
+persistentvolumeclaim "persistent-volume-claim-storagepool" created
+[root@rhel3 ~]# kubectl get pvc
+NAME                                  STATUS    VOLUME                                              CAPACITY   ACCESS MODES   STORAGECLASS                AGE
+persistent-volume-claim-storagepool   Bound     default-persistent-volume-claim-storagepool-00c15   1Gi        RWO            storage-class-storagepool   15s
+[root@rhel3 ~]# kubectl get pv
+NAME                                                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                                         STORAGECLASS                REASON    AGE
+default-persistent-volume-claim-storagepool-00c15   1Gi        RWO            Delete           Bound     default/persistent-volume-claim-storagepool   storage-class-storagepool             54s
+trident                                             2Gi        RWO            Retain           Bound     trident/trident                                                                     3d
+[root@rhel3 ~]# kubectl describe pv default-persistent-volume-claim-storagepool-00c15
+Name:            default-persistent-volume-claim-storagepool-00c15
+Labels:          <none>
+Annotations:     pv.kubernetes.io/provisioned-by=netapp.io/trident
+                 volume.beta.kubernetes.io/storage-class=storage-class-storagepool
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:    storage-class-storagepool
+Status:          Bound
+Claim:           default/persistent-volume-claim-storagepool
+Reclaim Policy:  Delete
+Access Modes:    RWO
+Capacity:        1Gi
+Node Affinity:   <none>
+Message:
+Source:
+    Type:      NFS (an NFS mount that lasts the lifetime of a pod)
+    Server:    192.168.0.132
+    Path:      /trident_default_persistent_volume_claim_storagepool_00c15
+    ReadOnly:  false
+Events:        <none>
+[root@rhel3 ~]# kubectl delete pvc persistent-volume-claim-storagepool
+persistentvolumeclaim "persistent-volume-claim-storagepool" deleted
+[root@rhel3 ~]# kubectl get sc
+NAME                        PROVISIONER         AGE
+storage-class-nas           netapp.io/trident   3d
+storage-class-solidfire     netapp.io/trident   3d
+storage-class-ssd           netapp.io/trident   3d
+storage-class-storagepool   netapp.io/trident   3d
+[root@rhel3 ~]# kubectl describe sc storage-class-ssd
+Name:                  storage-class-ssd
+IsDefaultClass:        No
+Annotations:           <none>
+Provisioner:           netapp.io/trident
+Parameters:            backendType=ontap-nas,media=ssd
+AllowVolumeExpansion:  <unset>
+MountOptions:          <none>
+ReclaimPolicy:         Delete
+VolumeBindingMode:     Immediate
+Events:                <none>
+[root@rhel3 ~]# cat   /root/k8s/pvcforssd.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: persistent-volume-claim-ssd
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: storage-class-ssd
+[root@rhel3 ~]# kubectl create -f /root/k8s/pvcforssd.yaml
+persistentvolumeclaim "persistent-volume-claim-ssd" created
+[root@rhel3 ~]# kubectl get pvc
+NAME                          STATUS    VOLUME                                      CAPACITY   ACCESS MODES   STORAGECLASS        AGE
+persistent-volume-claim-ssd   Bound     default-persistent-volume-claim-ssd-b0886   1Gi        RWO            storage-class-ssd   26s
+[root@rhel3 ~]# kubectl get pv
+NAME                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                                 STORAGECLASS        REASON    AGE
+default-persistent-volume-claim-ssd-b0886   1Gi        RWO            Delete           Bound     default/persistent-volume-claim-ssd   storage-class-ssd             28s
+trident                                     2Gi        RWO            Retain           Bound     trident/trident                                                     3d
+[root@rhel3 ~]# kubectl describe pv default-persistent-volume-claim-ssd-b0886
+Name:            default-persistent-volume-claim-ssd-b0886
+Labels:          <none>
+Annotations:     pv.kubernetes.io/provisioned-by=netapp.io/trident
+                 volume.beta.kubernetes.io/storage-class=storage-class-ssd
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:    storage-class-ssd
+Status:          Bound
+Claim:           default/persistent-volume-claim-ssd
+Reclaim Policy:  Delete
+Access Modes:    RWO
+Capacity:        1Gi
+Node Affinity:   <none>
+Message:
+Source:
+    Type:      NFS (an NFS mount that lasts the lifetime of a pod)
+    Server:    192.168.0.132
+    Path:      /trident_default_persistent_volume_claim_ssd_b0886
+    ReadOnly:  false
+Events:        <none>
+[root@rhel3 ~]# kubectl delete pvc persistent-volume-claim-ssd
+persistentvolumeclaim "persistent-volume-claim-ssd" deleted
+[root@rhel3 ~]# kubectl get sc
+NAME                        PROVISIONER         AGE
+storage-class-nas           netapp.io/trident   3d
+storage-class-solidfire     netapp.io/trident   3d
+storage-class-ssd           netapp.io/trident   3d
+storage-class-storagepool   netapp.io/trident   3d
+[root@rhel3 ~]# kubectl  describe sc storage-class-solidfire
+Name:                  storage-class-solidfire
+IsDefaultClass:        No
+Annotations:           <none>
+Provisioner:           netapp.io/trident
+Parameters:            IOPS=5000
+AllowVolumeExpansion:  <unset>
+MountOptions:          <none>
+ReclaimPolicy:         Delete
+VolumeBindingMode:     Immediate
+Events:                <none>
+[root@rhel3 ~]# cat   /root/k8s/pvcforsolidfire.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: persistent-volume-claim-solidfire
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: storage-class-solidfire
+[root@rhel3 ~]# kubectl create -f  /root/k8s/pvcforsolidfire.yaml
+persistentvolumeclaim "persistent-volume-claim-solidfire" created
+[root@rhel3 ~]# kubectl get pvc
+NAME                                STATUS    VOLUME                                            CAPACITY   ACCESS MODES   STORAGECLASS              AGE
+persistent-volume-claim-solidfire   Bound     default-persistent-volume-claim-solidfire-ae6cf   1Gi        RWO            storage-class-solidfire   14s
+[root@rhel3 ~]# kubectl get pv
+NAME                                              CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                                       STORAGECLASS              REASON    AGE
+default-persistent-volume-claim-solidfire-ae6cf   1Gi        RWO            Delete           Bound     default/persistent-volume-claim-solidfire   storage-class-solidfire             15s
+trident                                           2Gi        RWO            Retain           Bound     trident/trident                                                                 3d
+[root@rhel3 ~]# kubectl describe pv default-persistent-volume-claim-solidfire-ae6cf
+Name:            default-persistent-volume-claim-solidfire-ae6cf
+Labels:          <none>
+Annotations:     pv.kubernetes.io/provisioned-by=netapp.io/trident
+                 volume.beta.kubernetes.io/storage-class=storage-class-solidfire
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:    storage-class-solidfire
+Status:          Bound
+Claim:           default/persistent-volume-claim-solidfire
+Reclaim Policy:  Delete
+Access Modes:    RWO
+Capacity:        1Gi
+Node Affinity:   <none>
+Message:
+Source:
+    Type:               ISCSI (an ISCSI Disk resource that is attached to a kubelet's host machine and then exposed to the pod)
+    TargetPortal:       192.168.0.130:3260
+    IQN:                iqn.2010-01.com.solidfire:ok6w.default-persistent-volume-claim-solidfire-ae6cf.3
+    Lun:                0
+    ISCSIInterface      default
+    FSType:             ext4
+    ReadOnly:           false
+    Portals:            []
+    DiscoveryCHAPAuth:  false
+    SessionCHAPAuth:    false
+    SecretRef:          <nil>
+    InitiatorName:      <none>
+Events:                 <none>
+[root@rhel3 ~]# kubectl delete  pvc persistent-volume-claim-solidfire
+persistentvolumeclaim "persistent-volume-claim-solidfire" deleted
+[root@rhel3 ~]#

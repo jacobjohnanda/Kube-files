@@ -1,0 +1,22 @@
+login as: root
+root@rhel6.demo.netapp.com's password:
+Last login: Wed Jun 13 03:56:19 2018 from jumphost.demo.netapp.com
+[root@rhel6 ~]#
+[root@rhel6 ~]#
+[root@rhel6 ~]#
+[root@rhel6 ~]# docker pull registry.demo.netapp.com/my_custom_httpd
+Using default tag: latest
+latest: Pulling from my_custom_httpd
+61defd3c4157: Pull complete
+37085a83edcc: Pull complete
+1542c94fdd65: Pull complete
+5dfb7991faf1: Pull complete
+b6244eb0fc17: Pull complete
+968b6e1719ad: Pull complete
+9ddd98d13efd: Pull complete
+7841f8673fa9: Pull complete
+Digest: sha256:051d0c9475d828e64cc08c520cbb20d798f322a04f59adfd8f85edd87fe68d4d
+Status: Downloaded newer image for registry.demo.netapp.com/my_custom_httpd:latest
+[root@rhel6 ~]# docker run -d -p 80:80 registry.demo.netapp.com/my_custom_httpd
+4b122b94d4ff5404dd5f75749ba267492acd41baea37f421c09bdc50ac207213
+[root@rhel6 ~]#

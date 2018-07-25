@@ -1,0 +1,259 @@
+login as: root
+root@rhel3.demo.netapp.com's password:
+Last login: Wed Jun 13 05:48:49 2018 from jumphost.demo.netapp.com
+[root@rhel3 ~]#
+[root@rhel3 ~]#
+[root@rhel3 ~]# kubectl get sc
+kubectl get sc
+NAME                        PROVISIONER         AGE
+storage-class-nas           netapp.io/trident   3d
+storage-class-solidfire     netapp.io/trident   3d
+storage-class-ssd           netapp.io/trident   3d
+storage-class-storagepool   netapp.io/trident   3d
+[root@rhel3 ~]# kubectl get sc
+NAME                        PROVISIONER         AGE
+storage-class-nas           netapp.io/trident   3d
+storage-class-solidfire     netapp.io/trident   3d
+storage-class-ssd           netapp.io/trident   3d
+storage-class-storagepool   netapp.io/trident   3d
+[root@rhel3 ~]# kubectl describe sc storage-class-nas
+Name:                  storage-class-nas
+IsDefaultClass:        No
+Annotations:           <none>
+Provisioner:           netapp.io/trident
+Parameters:            backendType=ontap-nas
+AllowVolumeExpansion:  <unset>
+MountOptions:          <none>
+ReclaimPolicy:         Delete
+VolumeBindingMode:     Immediate
+Events:                <none>
+[root@rhel3 ~]# cat k8s/failover-pod.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  labels:
+    name: mongodb
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  clusterIP: None
+  selector:
+    role: mongodb
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  serviceName: "mongodb"
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: mongodb
+        environment: test
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: mongo
+          image: mongo
+          command:
+            - mongod
+            - "--replSet"
+            - rs0
+            - "--smallfiles"
+            - "--noprealloc"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+        - name: mongo-sidecar
+          image: cvallance/mongo-k8s-sidecar
+          env:
+            - name: MONGO_SIDECAR_POD_LABELS
+              value: "app=mongodb,environment=test"
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-persistent-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: storage-class-nas
+[root@rhel3 ~]# kubectl create -f failover-pod.yaml
+error: the path "failover-pod.yaml" does not exist
+[root@rhel3 ~]# kubectl create -f k8s/failover-pod.yaml
+service "mongodb" created
+statefulset.apps "mongodb" created
+[root@rhel3 ~]# kubectl get pods
+NAME        READY     STATUS    RESTARTS   AGE
+mongodb-0   2/2       Running   0          29s
+mongodb-1   2/2       Running   0          13s
+[root@rhel3 ~]# kubectl get pvc
+NAME                                 STATUS    VOLUME                                             CAPACITY   ACCESS MODES   STORAGECLASS        AGE
+mongo-persistent-storage-mongodb-0   Bound     default-mongo-persistent-storage-mongodb-0-2b097   1Gi        RWO            storage-class-nas   44s
+mongo-persistent-storage-mongodb-1   Bound     default-mongo-persistent-storage-mongodb-1-3495d   1Gi        RWO            storage-class-nas   28s
+[root@rhel3 ~]# kubectl get pv
+NAME                                               CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                                        STORAGECLASS        REASON    AGE
+default-mongo-persistent-storage-mongodb-0-2b097   1Gi        RWO            Delete           Bound     default/mongo-persistent-storage-mongodb-0   storage-class-nas             56s
+default-mongo-persistent-storage-mongodb-1-3495d   1Gi        RWO            Delete           Bound     default/mongo-persistent-storage-mongodb-1   storage-class-nas             46s
+trident                                            2Gi        RWO            Retain           Bound     trident/trident                                                            3d
+[root@rhel3 ~]# kubectl describe pv default-mongo-persistent-storage-mongodb-0-2b097
+Name:            default-mongo-persistent-storage-mongodb-0-2b097
+Labels:          <none>
+Annotations:     pv.kubernetes.io/provisioned-by=netapp.io/trident
+                 volume.beta.kubernetes.io/storage-class=storage-class-nas
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:    storage-class-nas
+Status:          Bound
+Claim:           default/mongo-persistent-storage-mongodb-0
+Reclaim Policy:  Delete
+Access Modes:    RWO
+Capacity:        1Gi
+Node Affinity:   <none>
+Message:
+Source:
+    Type:      NFS (an NFS mount that lasts the lifetime of a pod)
+    Server:    192.168.0.132
+    Path:      /trident_default_mongo_persistent_storage_mongodb_0_2b097
+    ReadOnly:  false
+Events:        <none>
+[root@rhel3 ~]# kubectl get pods -o wide
+NAME        READY     STATUS    RESTARTS   AGE       IP            NODE
+mongodb-0   2/2       Running   0          2m        10.244.2.11   rhel1
+mongodb-1   2/2       Running   0          2m        10.244.1.22   rhel2
+[root@rhel3 ~]# kubectl cordon rhel2
+node "rhel2" cordoned
+[root@rhel3 ~]# kubectl get nodes
+NAME      STATUS                     ROLES     AGE       VERSION
+rhel1     Ready                      <none>    3d        v1.10.2
+rhel2     Ready,SchedulingDisabled   <none>    3d        v1.10.4
+rhel3     Ready                      master    3d        v1.10.4
+[root@rhel3 ~]# kubectl delete pod mongodb-1
+pod "mongodb-1" deleted
+[root@rhel3 ~]# kubectl get pods -o wide
+NAME        READY     STATUS        RESTARTS   AGE       IP            NODE
+mongodb-0   2/2       Running       0          5m        10.244.2.11   rhel1
+mongodb-1   0/2       Terminating   0          5m        10.244.1.22   rhel2
+[root@rhel3 ~]# kubectl get pods -o wide
+NAME        READY     STATUS        RESTARTS   AGE       IP            NODE
+mongodb-0   2/2       Running       0          6m        10.244.2.11   rhel1
+mongodb-1   0/2       Terminating   0          5m        10.244.1.22   rhel2
+[root@rhel3 ~]# kubectl get pods -o wide
+NAME        READY     STATUS        RESTARTS   AGE       IP            NODE
+mongodb-0   2/2       Running       0          6m        10.244.2.11   rhel1
+mongodb-1   0/2       Terminating   0          6m        10.244.1.22   rhel2
+[root@rhel3 ~]# kubectl get pods -o wide
+NAME        READY     STATUS    RESTARTS   AGE       IP            NODE
+mongodb-0   2/2       Running   0          6m        10.244.2.11   rhel1
+mongodb-1   2/2       Running   0          16s       10.244.2.12   rhel1
+[root@rhel3 ~]# kubectl describe pod mongodb-1
+Name:           mongodb-1
+Namespace:      default
+Node:           rhel1/192.168.0.61
+Start Time:     Wed, 13 Jun 2018 06:21:56 +0000
+Labels:         app=mongodb
+                controller-revision-hash=mongodb-d8fc944b
+                environment=test
+                statefulset.kubernetes.io/pod-name=mongodb-1
+Annotations:    <none>
+Status:         Running
+IP:             10.244.2.12
+Controlled By:  StatefulSet/mongodb
+Containers:
+  mongo:
+    Container ID:  docker://a13363cb51d54e090d11c6b35626c6238c57424863e24178d7b6a614fb5c684e
+    Image:         mongo
+    Image ID:      docker-pullable://mongo@sha256:3a09cd85fb4e76f1d5832f9ea1d4e7481f76e807389b7d8ea6ac4d4ba96f83e5
+    Port:          27017/TCP
+    Host Port:     0/TCP
+    Command:
+      mongod
+      --replSet
+      rs0
+      --smallfiles
+      --noprealloc
+    State:          Running
+      Started:      Wed, 13 Jun 2018 06:21:59 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /data/db from mongo-persistent-storage (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-ss6wq (ro)
+  mongo-sidecar:
+    Container ID:   docker://7aea5b0b2438b02b55bc3279731746492731a12ff628055ebabc48752ce3ed17
+    Image:          cvallance/mongo-k8s-sidecar
+    Image ID:       docker-pullable://cvallance/mongo-k8s-sidecar@sha256:efed835090a4ea9204a4ec8fc2151ed23e8bbf4fe21668a4645e4065d23a1d98
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Wed, 13 Jun 2018 06:22:00 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      MONGO_SIDECAR_POD_LABELS:  app=mongodb,environment=test
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-ss6wq (ro)
+Conditions:
+  Type           Status
+  Initialized    True
+  Ready          True
+  PodScheduled   True
+Volumes:
+  mongo-persistent-storage:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  mongo-persistent-storage-mongodb-1
+    ReadOnly:   false
+  default-token-ss6wq:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-ss6wq
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason                 Age   From               Message
+  ----    ------                 ----  ----               -------
+  Normal  Scheduled              1m    default-scheduler  Successfully assigned mongodb-1 to rhel1
+  Normal  SuccessfulMountVolume  1m    kubelet, rhel1     MountVolume.SetUp succeeded for volume "default-token-ss6wq"
+  Normal  SuccessfulMountVolume  1m    kubelet, rhel1     MountVolume.SetUp succeeded for volume "default-mongo-persistent-storage-mongodb-1-3495d"
+  Normal  Pulling                1m    kubelet, rhel1     pulling image "mongo"
+  Normal  Pulled                 59s   kubelet, rhel1     Successfully pulled image "mongo"
+  Normal  Created                59s   kubelet, rhel1     Created container
+  Normal  Started                59s   kubelet, rhel1     Started container
+  Normal  Pulling                59s   kubelet, rhel1     pulling image "cvallance/mongo-k8s-sidecar"
+  Normal  Pulled                 59s   kubelet, rhel1     Successfully pulled image "cvallance/mongo-k8s-sidecar"
+  Normal  Created                58s   kubelet, rhel1     Created container
+  Normal  Started                58s   kubelet, rhel1     Started container
+[root@rhel3 ~]# kubectl uncordon rhel2
+node "rhel2" uncordoned
+[root@rhel3 ~]# kubectl get nodes -o wide
+kubectl get nodes -o wide
+NAME      STATUS    ROLES     AGE       VERSION   EXTERNAL-IP   OS-IMAGE                                      KERNEL-VERSION          CONTAINER-RUNTIME
+rhel1     Ready     <none>    3d        v1.10.2   <none>        Red Hat Enterprise Linux Server 7.3 (Maipo)   3.10.0-514.el7.x86_64   docker://17.3.0
+rhel2     Ready     <none>    3d        v1.10.4   <none>        Red Hat Enterprise Linux Server 7.3 (Maipo)   3.10.0-514.el7.x86_64   docker://17.3.0
+rhel3     Ready     master    3d        v1.10.4   <none>        Red Hat Enterprise Linux Server 7.3 (Maipo)   3.10.0-514.el7.x86_64   docker://17.3.0
+[root@rhel3 ~]# kubectl get nodes -o wide
+NAME      STATUS    ROLES     AGE       VERSION   EXTERNAL-IP   OS-IMAGE                                      KERNEL-VERSION          CONTAINER-RUNTIME
+rhel1     Ready     <none>    3d        v1.10.2   <none>        Red Hat Enterprise Linux Server 7.3 (Maipo)   3.10.0-514.el7.x86_64   docker://17.3.0
+rhel2     Ready     <none>    3d        v1.10.4   <none>        Red Hat Enterprise Linux Server 7.3 (Maipo)   3.10.0-514.el7.x86_64   docker://17.3.0
+rhel3     Ready     master    3d        v1.10.4   <none>        Red Hat Enterprise Linux Server 7.3 (Maipo)   3.10.0-514.el7.x86_64   docker://17.3.0
+[root@rhel3 ~]# kubectl delete  -f k8s/failover-pod.yaml
+service "mongodb" deleted
+statefulset.apps "mongodb" deleted
+[root@rhel3 ~]# kubectl get pvc
+NAME                                 STATUS    VOLUME                                             CAPACITY   ACCESS MODES   STORAGECLASS        AGE
+mongo-persistent-storage-mongodb-0   Bound     default-mongo-persistent-storage-mongodb-0-2b097   1Gi        RWO            storage-class-nas   16m
+mongo-persistent-storage-mongodb-1   Bound     default-mongo-persistent-storage-mongodb-1-3495d   1Gi        RWO            storage-class-nas   16m
+[root@rhel3 ~]# kubectl delete  pvc mongo-persistent-storage-mongodb-0
+persistentvolumeclaim "mongo-persistent-storage-mongodb-0" deleted
+[root@rhel3 ~]# kubectl delete  pvc mongo-persistent-storage-mongodb-1
+persistentvolumeclaim "mongo-persistent-storage-mongodb-1" deleted
+[root@rhel3 ~]#
+[root@rhel3 ~]#

@@ -1,0 +1,270 @@
+login as: root
+root@rhel5.demo.netapp.com's password:
+Last login: Wed Jun 13 02:51:47 2018 from jumphost.demo.netapp.com
+[root@rhel5 ~]# docker volume create --name=myhttpd
+myhttpd
+[root@rhel5 ~]# docker volume ls
+DRIVER              VOLUME NAME
+local               myhttpd
+[root@rhel5 ~]# docker volume inspect myhttpd
+[
+    {
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/myhttpd/_data",
+        "Name": "myhttpd",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+[root@rhel5 ~]# ls /var/lib/docker/volumes/myhttpd/_data
+[root@rhel5 ~]# docker run -d --name my_www -v myhttpd:/usr/local/apache2/htdocs
+"docker run" requires at least 1 argument(s).
+See 'docker run --help'.
+
+Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+
+Run a command in a new container
+[root@rhel5 ~]# -p 80:80 httpd:2.2
+-bash: -p: command not found
+[root@rhel5 ~]# docker run -d --name my_www -v myhttpd:/usr/local/apache2/htdocs                   -p 80:80 httpd:2.2
+a72aaa8f41742c4a0ee0d6207e15eb4ea4752321db4b6e23764f133cde037a56
+[root@rhel5 ~]# docker inspect my_www
+[
+    {
+        "Id": "a72aaa8f41742c4a0ee0d6207e15eb4ea4752321db4b6e23764f133cde037a56"                  ,
+        "Created": "2018-06-13T03:19:54.635003383Z",
+        "Path": "httpd-foreground",
+        "Args": [],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 4310,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2018-06-13T03:19:55.039211686Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:e06c3dbbfe239c6fca50b6ab6935b3122930fa2eea2136979e5b46a                  d77ecb685",
+        "ResolvConfPath": "/var/lib/docker/containers/a72aaa8f41742c4a0ee0d6207e                  15eb4ea4752321db4b6e23764f133cde037a56/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/a72aaa8f41742c4a0ee0d6207e15                  eb4ea4752321db4b6e23764f133cde037a56/hostname",
+        "HostsPath": "/var/lib/docker/containers/a72aaa8f41742c4a0ee0d6207e15eb4                  ea4752321db4b6e23764f133cde037a56/hosts",
+        "LogPath": "/var/lib/docker/containers/a72aaa8f41742c4a0ee0d6207e15eb4ea                  4752321db4b6e23764f133cde037a56/a72aaa8f41742c4a0ee0d6207e15eb4ea4752321db4b6e23                  764f133cde037a56-json.log",
+        "Name": "/my_www",
+        "RestartCount": 0,
+        "Driver": "devicemapper",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "myhttpd:/usr/local/apache2/htdocs"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {
+                "80/tcp": [
+                    {
+                        "HostIp": "",
+                        "HostPort": "80"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": -1,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0
+        },
+        "GraphDriver": {
+            "Name": "devicemapper",
+            "Data": {
+                "DeviceId": "270",
+                "DeviceName": "docker-253:1-998953-9ad260c7665568d8501c014aa75f5                  6a8966c152857c5a1f3e908ad49a258b3e1",
+                "DeviceSize": "107374182400"
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "myhttpd",
+                "Source": "/var/lib/docker/volumes/myhttpd/_data",
+                "Destination": "/usr/local/apache2/htdocs",
+                "Driver": "local",
+                "Mode": "z",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+        "Config": {
+            "Hostname": "a72aaa8f4174",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "80/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/apache2/bin:/usr/local/sbin:/usr/local/bin:/usr                  /sbin:/usr/bin:/sbin:/bin",
+                "HTTPD_PREFIX=/usr/local/apache2",
+                "HTTPD_VERSION=2.2.34",
+                "HTTPD_SHA256=e53183d5dfac5740d768b4c9bea193b1099f4b06b57e5f28d7                  caaf9ea7498160",
+                "HTTPD_PATCHES=CVE-2017-9798-patch-2.2.patch 42c610f8a8f8d4d0866                  4db6d9857120c2c252c9b388d56f238718854e6013e46 2.2.x-mod_proxy-without-APR_HAS_TH                  READS.patch beb66a79a239f7e898311c5ed6a38c070c641ec56706a295b7e5caf3c55a7296",
+                "APACHE_DIST_URLS=https://www.apache.org/dyn/closer.cgi?action=d                  ownload&filename= \thttps://www-us.apache.org/dist/ \thttps://www.apache.org/dis                  t/ \thttps://archive.apache.org/dist/"
+            ],
+            "Cmd": [
+                "httpd-foreground"
+            ],
+            "ArgsEscaped": true,
+            "Image": "httpd:2.2",
+            "Volumes": null,
+            "WorkingDir": "/usr/local/apache2",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "f0cee29230ccbab32e1dfc3f418b4db7d180bda7f4108279866ed2                  76489fd99f",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {
+                "80/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "80"
+                    }
+                ]
+            },
+            "SandboxKey": "/var/run/docker/netns/f0cee29230cc",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "5e79dc044bef5d2600ae6ea2b12dca58c56f7d929a77ebf923af8                  af4b287f638",
+            "Gateway": "172.17.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.17.0.2",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "MacAddress": "02:42:ac:11:00:02",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "476483dc6c4b5dd15b20e6ca851ef6ce0878d60460fd3d                  32e10d683587da237c",
+                    "EndpointID": "5e79dc044bef5d2600ae6ea2b12dca58c56f7d929a77e                  bf923af8af4b287f638",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:02"
+                }
+            }
+        }
+    }
+]
+[root@rhel5 ~]# docker exec -it my_www /bin/bash
+root@a72aaa8f4174:/usr/local/apache2# ls
+bin  build  cgi-bin  conf  error  htdocs  icons  include  logs  modules
+root@a72aaa8f4174:/usr/local/apache2# cd htdocs/
+root@a72aaa8f4174:/usr/local/apache2/htdocs# ls
+index.html
+root@a72aaa8f4174:/usr/local/apache2/htdocs# cat index.html
+<html><body><h1>It works!</h1></body></html>root@a72aaa8f4174:/usr/local/apache2                  !</h1>' > index.htmlhis is a persistent page
+root@a72aaa8f4174:/usr/local/apache2/htdocs# echo '<h1>This is a persistent page                  !</h1>' > index.html
+root@a72aaa8f4174:/usr/local/apache2/htdocs# cat index.html                                       <h1>This is a persistent page!</h1>
+root@a72aaa8f4174:/usr/local/apache2/htdocs# exit
+exit
+[root@rhel5 ~]#  docker stop my_www && docker rm my_www
+Error response from daemon: No such container: my_www
+[root@rhel5 ~]# ls -l /var/lib/docker/volumes/myhttpd/_data
+total 4
+-rw-r--r-- 1 1001 1001 36 Jun 13 03:24 index.html
+[root@rhel5 ~]# cat /var/lib/docker/volumes/myhttpd/_data/index.html
+<h1>This is a persistent page!</h1>
+[root@rhel5 ~]# docker run -d --name my_www -v myhttpd:/usr/local/apache2/htdocs                   -p 80:80 httpd:latest
+ba07472e41d75e6732783b75d1c7b71be9840365870dda3a25de0ee000d85d0e
+[root@rhel5 ~]# docker stop my_www && docker rm my_www
+my_www
+my_www
+[root@rhel5 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+[root@rhel5 ~]# docker volume rm myhttpd
+myhttpd
+[root@rhel5 ~]# docker volume ls
+DRIVER              VOLUME NAME
+[root@rhel5 ~]#

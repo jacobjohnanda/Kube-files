@@ -1,0 +1,64 @@
+login as: root
+root@rhel5.demo.netapp.com's password:
+Last login: Wed Jun 13 03:17:24 2018 from jumphost.demo.netapp.com
+[root@rhel5 ~]# cd
+[root@rhel5 ~]# pwd
+/root
+[root@rhel5 ~]# ls
+bkup  sc_412
+[root@rhel5 ~]# mkdir www
+[root@rhel5 ~]# ls
+bkup  sc_412  www
+[root@rhel5 ~]# mount svm1:/www /root/www
+[root@rhel5 ~]# cd www
+[root@rhel5 www]# cd ls
+-bash: cd: ls: No such file or directory
+[root@rhel5 www]# ls
+[root@rhel5 www]# echo 'The hostname is <?php echo gethostname(); ?>' > index.php
+[root@rhel5 www]# ls -a
+.  ..  index.php  .snapshot
+[root@rhel5 www]# ls -al
+total 12
+drwxr-xr-x  2 root root 4096 Jun 13 03:34 .
+dr-xr-x---. 9 root root 4096 Jun 13 03:33 ..
+-rw-r--r--  1 root root   45 Jun 13 03:34 index.php
+drwxrwxrwx  2 root root 4096 May  1 18:26 .snapshot
+[root@rhel5 www]# cat index.php
+The hostname is <?php echo gethostname(); ?>
+[root@rhel5 www]# docker run -d --name my_php -v /root/www:/var/www/html -p 80:80 php:5.5-apache
+Unable to find image 'php:5.5-apache' locally
+5.5-apache: Pulling from library/php
+357ea8c3d80b: Pull complete
+85537f80f73d: Pull complete
+3d821ad560e1: Pull complete
+b4ae91aad522: Pull complete
+66e1c1a53c95: Pull complete
+5d1f306a8912: Pull complete
+37733078a51e: Pull complete
+c5351b4d6bee: Pull complete
+4f946c4dcbe2: Pull complete
+0c48c69d4b11: Pull complete
+dbc71ed1796a: Pull complete
+9c6d026ad711: Pull complete
+3fced1e5eb8f: Pull complete
+Digest: sha256:be7f9332d3bea49084d74a0718a5400f7b5d128c1937575e76f72df3a41e8eac
+Status: Downloaded newer image for php:5.5-apache
+f72c018834a6904ecc15a3d178034d457a9f822d75fcd861cd30210237f7f303
+[root@rhel5 www]# docker ps
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                NAMES
+f72c018834a6        php:5.5-apache      "apache2-foreground"   24 seconds ago      Up 22 seconds       0.0.0.0:80->80/tcp   my_php
+[root@rhel5 www]# echo '<h2>This line is the same regardless of the serving container!</h2>' >> index.php [root@ rhel4 www]# cat index.php
+[root@rhel5 www]# echo '<h2>This line is the same regardless of the serving container!</h2>' >> index.^Cp [root@ rhel4 www]# cat index.php
+[root@rhel5 www]# ^C
+[root@rhel5 www]# cat '<h2>This line is the same regardless of the serving container!</h2>' >> index.php
+cat: <h2>This line is the same regardless of the serving container!</h2>: No such file or directory
+[root@rhel5 www]# echo  '<h2>This line is the same regardless of the serving container!</h2>' >> index.php
+[root@rhel5 www]# cat index.php
+The hostname is <?php echo gethostname(); ?>
+<h2>This line is the same regardless of the serving container!</h2> [root@ rhel4 www]# cat index.php
+<h2>This line is the same regardless of the serving container!</h2>
+[root@rhel5 www]# vi index.php
+[root@rhel5 www]# docker stop my_php && docker rm my_php
+my_php
+my_php
+[root@rhel5 www]#

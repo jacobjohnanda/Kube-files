@@ -1,0 +1,79 @@
+login as: root
+root@rhel5.demo.netapp.com's password:
+Last login: Wed Jun 13 03:56:04 2018 from jumphost.demo.netapp.com
+[root@rhel5 ~]# docker run -d --name my_custom_httpd httpd:latest
+4003d517185c110c135dd223938c9a7ec9db6bff4be51f195be9e52be17d6a55
+[root@rhel5 ~]# docker exec -it my_custom_httpd /bin/bash
+root@4003d517185c:/usr/local/apache2# echo
+
+root@4003d517185c:/usr/local/apache2#
+root@4003d517185c:/usr/local/apache2# echo '<h1>My customized Apache page</h1>' > htdocs/index.html
+root@4003d517185c:/usr/local/apache2# ls
+bin  build  cgi-bin  conf  error  htdocs  icons  include  logs  modules
+root@4003d517185c:/usr/local/apache2# cat htdocs/index.html
+<h1>My customized Apache page</h1>
+root@4003d517185c:/usr/local/apache2# docker ps
+bash: docker: command not found
+root@4003d517185c:/usr/local/apache2# exit
+exit
+[root@rhel5 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND              CREATED              STATUS              PORTS               NAMES
+4003d517185c        httpd:latest        "httpd-foreground"   About a minute ago   Up About a minute   80/tcp              my_custom_httpd
+[root@rhel5 ~]# docker stop my_custom_httpd
+my_custom_httpd
+[root@rhel5 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+[root@rhel5 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND              CREATED             STATUS                      PORTS               NAMES
+4003d517185c        httpd:latest        "httpd-foreground"   2 minutes ago       Exited (0) 48 seconds ago                       my_custom_httpd
+[root@rhel5 ~]# docker commit my_custom_httpd registry.demo.netapp.com/my_custom_httpd:latest
+sha256:6d374d564bfaf66f13f0cd98064609fc09072c7c65ed958d1bd44c53a1475490
+[root@rhel5 ~]# docker images
+REPOSITORY                                 TAG                 IMAGE ID            CREATED             SIZE
+registry.demo.netapp.com/my_custom_httpd   latest              6d374d564bfa        17 seconds ago      177 MB
+busybox                                    latest              8c811b4aec35        2 weeks ago         1.15 MB
+httpd                                      latest              fb2f3851a971        6 weeks ago         177 MB
+httpd                                      2.2                 e06c3dbbfe23        4 months ago        171 MB
+php                                        5.5-apache          ea0a3d41ce6c        22 months ago       390 MB
+[root@rhel5 ~]# docker push registry.demo.netapp.com/my_custom_httpd
+The push refers to a repository [registry.demo.netapp.com/my_custom_httpd]
+d3289931e2f1: Pushed
+0f8d971d177b: Pushed
+97fd31ecd005: Pushed
+82155933cfa6: Pushed
+2fd9f57029b0: Pushed
+02bd518ef304: Pushed
+b8342f9976fc: Pushed
+2c833f307fd8: Pushed
+latest: digest: sha256:051d0c9475d828e64cc08c520cbb20d798f322a04f59adfd8f85edd87fe68d4d size: 1987
+[root@rhel5 ~]# mkdir /tmp/custom
+[root@rhel5 ~]# cd /tmp/custom
+[root@rhel5 custom]# echo '<h1>Created by Dockerfile</h1>' > index.html
+[root@rhel5 custom]# echo 'FROM httpd:latest' > Dockerfile
+[root@rhel5 custom]# echo 'ADD index.html /usr/local/apache2/htdocs/index.html' >> Dockerfile
+[root@rhel5 custom]# cat Dockerfile
+FROM httpd:latest
+ADD index.html /usr/local/apache2/htdocs/index.html
+[root@rhel5 custom]# docker build -t registry.demo.netapp.com/another_custom_httpd /tmp/custom
+Sending build context to Docker daemon 3.072 kB
+Step 1/2 : FROM httpd:latest
+ ---> fb2f3851a971
+Step 2/2 : ADD index.html /usr/local/apache2/htdocs/index.html
+ ---> 421e672c8596
+Removing intermediate container 24b344cd6426
+Successfully built 421e672c8596
+[root@rhel5 custom]# docker images
+REPOSITORY                                      TAG                 IMAGE ID            CREATED             SIZE
+registry.demo.netapp.com/another_custom_httpd   latest              421e672c8596        13 seconds ago      177 MB
+registry.demo.netapp.com/my_custom_httpd        latest              6d374d564bfa        8 minutes ago       177 MB
+busybox                                         latest              8c811b4aec35        2 weeks ago         1.15 MB
+httpd                                           latest              fb2f3851a971        6 weeks ago         177 MB
+httpd                                           2.2                 e06c3dbbfe23        4 months ago        171 MB
+php                                             5.5-apache          ea0a3d41ce6c        22 months ago       390 MB
+[root@rhel5 custom]# docker run -d -p 80:80 registry.demo.netapp.com/another_custom_httpd
+cde305a052220b2c526205abee5629602ef14a3834270c71e72a176e5eedaa3c
+[root@rhel5 custom]# docker ps -a
+CONTAINER ID        IMAGE                                           COMMAND              CREATED             STATUS                     PORTS                NAMES
+cde305a05222        registry.demo.netapp.com/another_custom_httpd   "httpd-foreground"   9 seconds ago       Up 9 seconds               0.0.0.0:80->80/tcp   eloquent_leavitt
+4003d517185c        httpd:latest                                    "httpd-foreground"   11 minutes ago      Exited (0) 9 minutes ago                        my_custom_httpd
+[root@rhel5 custom]#

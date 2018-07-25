@@ -1,0 +1,149 @@
+login as: root
+root@rhel5.demo.netapp.com's password:
+Access denied
+root@rhel5.demo.netapp.com's password:
+Last failed login: Wed Jun 13 03:56:00 UTC 2018 from jumphost.demo.netapp.com on                                                                                  ssh:notty
+There was 1 failed login attempt since the last successful login.
+Last login: Wed Jun 13 03:32:59 2018 from jumphost.demo.netapp.com
+[root@rhel5 ~]# docker plugin ls
+ID                  NAME                DESCRIPTION         ENABLED
+[root@rhel5 ~]# ls -l /etc/netappdvp
+total 4
+-rw-r--r-- 1 root root 238 Jun 12 08:23 config.json
+[root@rhel5 ~]# cat
+.bash_history  .bashrc        .config/       .pki/          .tcshrc
+.bash_logout   bkup/          .cshrc         sc_412/        .viminfo
+.bash_profile  .cache/        ._netappdvp    .ssh/          www/
+[root@rhel5 ~]# cat /etc/netappdvp/config.json
+{
+    "version": 1,
+    "storageDriverName": "ontap-nas",
+    "backendName": "NDVPBackend",
+    "managementLIF": "192.168.0.135",
+    "dataLIF": "192.168.0.132",
+    "svm": "svm1",
+    "username": "vsadmin",
+    "password": "Netapp1!"
+}
+
+[root@rhel5 ~]# docker plugin install netapp/ndvp-plugin:18.04 --alias netapp --                                                                                 grant-all-permissions
+Error response from daemon: manifest for netapp/ndvp-plugin:18.04 not found
+[root@rhel5 ~]# docker plugin install netapp/trident-plugin:18.04 --alias netapp                                                                                  --grant-all-permissions
+18.04: Pulling from netapp/trident-plugin
+034317db844f: Download complete
+Digest: sha256:845065dee9abd6ea0a80720974faf9dc08f8f978f9a00ab6e0a20ce662862073
+Status: Downloaded newer image for netapp/trident-plugin:18.04
+Installed plugin netapp/trident-plugin:18.04
+[root@rhel5 ~]# docker plugin ls
+ID                  NAME                DESCRIPTION                                                                                                              ENABLED
+dd3e1b858ef7        netapp:latest       Trident - NetApp Docker Volume Plugin                                                                                    true
+[root@rhel5 ~]# docker volume ls
+DRIVER              VOLUME NAME
+[root@rhel5 ~]# docker volume create -d netapp --name my_data -o size=10g
+my_data
+[root@rhel5 ~]# docker volume ls
+DRIVER              VOLUME NAME
+netapp:latest       my_data
+[root@rhel5 ~]# docker volume inspect my_data
+[
+    {
+        "Driver": "netapp:latest",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/plugins/dd3e1b858ef7e940e5668e33f658349aa                                                                                 758d499dcc3ac7e9dc3ea8afafc19e1/rootfs",
+        "Name": "my_data",
+        "Options": {
+            "size": "10g"
+        },
+        "Scope": "global",
+        "Status": {
+            "Snapshots": []
+        }
+    }
+]
+[root@rhel5 ~]#
+Broadcast message from systemd-journald@rhel5 (Wed 2018-06-13 04:07:04 UTC):
+
+iscsid[1369]:
+
+
+Message from syslogd@rhel5 at Jun 13 04:07:04 ...
+ iscsid:
+
+[root@rhel5 ~]#
+[root@rhel5 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED                                                                                              STATUS              PORTS               NAMES
+[root@rhel5 ~]# docker run -it --name mycont -v my_data:/data busybox /bin/sh
+Unable to find image 'busybox:latest' locally
+latest: Pulling from library/busybox
+07a152489297: Pull complete
+Digest: sha256:141c253bc4c3fd0a201d32dc1f493bcf3fff003b6df416dea4f41046e0f37d47
+Status: Downloaded newer image for busybox:latest
+/ # â??mount | grep my_data^C
+/ # mount | grep my_data
+192.168.0.132:/netappdvp_my_data on /data type nfs (rw,relatime,vers=3,rsize=655                                                                                 36,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=1                                                                                 92.168.0.132,mountvers=3,mountport=635,mountproto=udp,local_lock=none,addr=192.1                                                                                 68.0.132)
+/ #
+/ # date > /data/test.txt
+/ # ls -l /data/test.txt
+-rw-r--r--    1 root     root            29 Jun 13 04:13 /data/test.txt
+/ # cat /data/test.txt
+Wed Jun 13 04:13:46 UTC 2018
+/ # exit
+[root@rhel5 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED                                                                                              STATUS                      PORTS               NAMES
+3b858b72a3b3        busybox             "/bin/sh"           2 minutes ago                                                                                        Exited (0) 11 seconds ago                       mycont
+[root@rhel5 ~]# doc
+Broadcast message from systemd-journald@rhel5 (Wed 2018-06-13 04:15:04 UTC):
+
+iscsid[1369]:
+
+
+Message from syslogd@rhel5 at Jun 13 04:15:04 ...
+ iscsid:
+[root@rhel5 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                      PORTS               NAMES
+3b858b72a3b3        busybox             "/bin/sh"           2 minutes ago       Exited (0) 53 seconds ago                       mycont
+[root@rhel5 ~]# docker log 3b858b72a3b3
+docker: 'log' is not a docker command.
+See 'docker --help'
+[root@rhel5 ~]# docker logs 3b858b72a3b3
+/ # â??mount | grep my_data^C
+/ # mount | grep my_data
+192.168.0.132:/netappdvp_my_data on /data type nfs (rw,relatime,vers=3,rsize=65536,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=192.168.0.132,mountvers=3,mountport=635,mountproto=udp,local_lock=none,addr=192.168.0.132)
+/ #
+/ # date > /data/test.txt
+/ # ls -l /data/test.txt
+-rw-r--r--    1 root     root            29 Jun 13 04:13 /data/test.txt
+/ # cat /data/test.txt
+Wed Jun 13 04:13:46 UTC 2018
+/ # exit
+[root@rhel5 ~]# docker stop  3b858b72a3b3
+3b858b72a3b3
+[root@rhel5 ~]# docker start  3b858b72a3b3
+3b858b72a3b3
+[root@rhel5 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+3b858b72a3b3        busybox             "/bin/sh"           4 minutes ago       Up 6 seconds                            mycont
+[root@rhel5 ~]# docker rm mycont
+Error response from daemon: You cannot remove a running container 3b858b72a3b38752bd5497235ac2fa0e0561a531daee680e0fa722a4f73e0432. Stop the container before attempting removal or use -f
+[root@rhel5 ~]# docker stop  mycont
+mycont
+[root@rhel5 ~]# docker rm  mycont
+mycont
+[root@rhel5 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+[root@rhel5 ~]#
+Broadcast message from systemd-journald@rhel5 (Wed 2018-06-13 04:24:07 UTC):
+
+iscsid[1369]:
+
+
+Message from syslogd@rhel5 at Jun 13 04:24:07 ...
+ iscsid:
+
+[root@rhel5 ~]#
+[root@rhel5 ~]# docker volume rm my_data
+my_data
+[root@rhel5 ~]# docker volumem ls
+docker: 'volumem' is not a docker command.
+See 'docker --help'
+[root@rhel5 ~]#

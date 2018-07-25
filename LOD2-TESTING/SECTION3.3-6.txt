@@ -1,0 +1,36 @@
+login as: root
+root@rhel6.demo.netapp.com's password:
+Last login: Wed Jun 13 02:52:33 2018 from jumphost.demo.netapp.com
+[root@rhel6 ~]# ls /mnt
+hgfs
+[root@rhel6 ~]#  mkdir /mnt/www
+[root@rhel6 ~]# mount svm1:/www /mnt/www
+[root@rhel6 ~]# ls -l /mnt/www
+total 4
+-rw-r--r-- 1 root root 113 Jun 13 03:41 index.php
+[root@rhel6 ~]# docker run -d --name my_php -v /mnt/www:/var/www/html -p 80:80 php:5.5-apache
+Unable to find image 'php:5.5-apache' locally
+5.5-apache: Pulling from library/php
+357ea8c3d80b: Pull complete
+85537f80f73d: Pull complete
+3d821ad560e1: Pull complete
+b4ae91aad522: Pull complete
+66e1c1a53c95: Pull complete
+5d1f306a8912: Pull complete
+37733078a51e: Pull complete
+c5351b4d6bee: Pull complete
+4f946c4dcbe2: Pull complete
+0c48c69d4b11: Pull complete
+dbc71ed1796a: Pull complete
+9c6d026ad711: Pull complete
+3fced1e5eb8f: Pull complete
+Digest: sha256:be7f9332d3bea49084d74a0718a5400f7b5d128c1937575e76f72df3a41e8eac
+Status: Downloaded newer image for php:5.5-apache
+a3f5f435761b014915d144df65b61d51a975454a5c74966d17609f5c14b0d82c
+[root@rhel6 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS                NAMES
+a3f5f435761b        php:5.5-apache      "apache2-foreground"   15 seconds ago      Up 15 seconds       0.0.0.0:80->80/tcp   my_php
+[root@rhel6 ~]# docker stop my_php && docker rm my_php
+my_php
+my_php
+[root@rhel6 ~]#

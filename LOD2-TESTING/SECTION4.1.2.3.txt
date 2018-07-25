@@ -1,0 +1,379 @@
+login as: root
+root@rhel3.demo.netapp.com's password:
+Last login: Tue Jun 12 09:01:23 2018 from jumphost.demo.netapp.com
+[root@rhel3 ~]# kubectl get nodes
+NAME      STATUS    ROLES     AGE       VERSION
+rhel1     Ready     <none>    3d        v1.10.2
+rhel2     Ready     <none>    3d        v1.10.4
+rhel3     Ready     master    3d        v1.10.4
+[root@rhel3 ~]# kubectl describe node rhel3
+Name:               rhel3
+Roles:              master
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/hostname=rhel3
+                    node-role.kubernetes.io/master=
+Annotations:        flannel.alpha.coreos.com/backend-data={"VtepMAC":"ee:79:5d:97:ad:7f"}
+                    flannel.alpha.coreos.com/backend-type=vxlan
+                    flannel.alpha.coreos.com/kube-subnet-manager=true
+                    flannel.alpha.coreos.com/public-ip=192.168.0.63
+                    node.alpha.kubernetes.io/ttl=0
+                    volumes.kubernetes.io/controller-managed-attach-detach=true
+CreationTimestamp:  Sat, 09 Jun 2018 15:18:54 +0000
+Taints:             node-role.kubernetes.io/master:NoSchedule
+Unschedulable:      false
+Conditions:
+  Type             Status  LastHeartbeatTime                 LastTransitionTime                Reason                       Message
+  ----             ------  -----------------                 ------------------                ------                       -------
+  OutOfDisk        False   Wed, 13 Jun 2018 04:51:21 +0000   Sat, 09 Jun 2018 15:18:46 +0000   KubeletHasSufficientDisk     kubelet has sufficient disk space available
+  MemoryPressure   False   Wed, 13 Jun 2018 04:51:21 +0000   Sat, 09 Jun 2018 15:18:46 +0000   KubeletHasSufficientMemory   kubelet has sufficient memory available
+  DiskPressure     False   Wed, 13 Jun 2018 04:51:21 +0000   Sat, 09 Jun 2018 15:18:46 +0000   KubeletHasNoDiskPressure     kubelet has no disk pressure
+  PIDPressure      False   Wed, 13 Jun 2018 04:51:21 +0000   Sat, 09 Jun 2018 15:18:46 +0000   KubeletHasSufficientPID      kubelet has sufficient PID available
+  Ready            True    Wed, 13 Jun 2018 04:51:21 +0000   Sat, 09 Jun 2018 15:24:44 +0000   KubeletReady                 kubelet is posting ready status
+Addresses:
+  InternalIP:  192.168.0.63
+  Hostname:    rhel3
+Capacity:
+ cpu:                2
+ ephemeral-storage:  39265556Ki
+ hugepages-2Mi:      0
+ memory:             1883996Ki
+ pods:               110
+Allocatable:
+ cpu:                2
+ ephemeral-storage:  36187136350
+ hugepages-2Mi:      0
+ memory:             1781596Ki
+ pods:               110
+System Info:
+ Machine ID:                 447bc68ac2f3494fa211c573ab48e6c8
+ System UUID:                4218F920-1D51-98AF-8208-9B9DEA6D8D15
+ Boot ID:                    77b617ca-661a-459c-a87a-c09a68c954f4
+ Kernel Version:             3.10.0-514.el7.x86_64
+ OS Image:                   Red Hat Enterprise Linux Server 7.3 (Maipo)
+ Operating System:           linux
+ Architecture:               amd64
+ Container Runtime Version:  docker://17.3.0
+ Kubelet Version:            v1.10.4
+ Kube-Proxy Version:         v1.10.4
+PodCIDR:                     10.244.0.0/24
+ExternalID:                  rhel3
+Non-terminated Pods:         (7 in total)
+  Namespace                  Name                             CPU Requests  CPU Limits  Memory Requests  Memory Limits
+  ---------                  ----                             ------------  ----------  ---------------  -------------
+  kube-system                etcd-rhel3                       0 (0%)        0 (0%)      0 (0%)           0 (0%)
+  kube-system                kube-apiserver-rhel3             250m (12%)    0 (0%)      0 (0%)           0 (0%)
+  kube-system                kube-controller-manager-rhel3    200m (10%)    0 (0%)      0 (0%)           0 (0%)
+  kube-system                kube-dns-86f4d74b45-k5xdt        260m (13%)    0 (0%)      110Mi (6%)       170Mi (9%)
+  kube-system                kube-flannel-ds-cz2mq            0 (0%)        0 (0%)      0 (0%)           0 (0%)
+  kube-system                kube-proxy-5qlxd                 0 (0%)        0 (0%)      0 (0%)           0 (0%)
+  kube-system                kube-scheduler-rhel3             100m (5%)     0 (0%)      0 (0%)           0 (0%)
+Allocated resources:
+  (Total limits may be over 100 percent, i.e., overcommitted.)
+  CPU Requests  CPU Limits  Memory Requests  Memory Limits
+  ------------  ----------  ---------------  -------------
+  810m (40%)    0 (0%)      110Mi (6%)       170Mi (9%)
+Events:         <none>
+[root@rhel3 ~]# kubectl get namespaces
+NAME          STATUS    AGE
+default       Active    3d
+kube-public   Active    3d
+kube-system   Active    3d
+trident       Active    3d
+[root@rhel3 ~]# kubectl get pods -n trident
+NAME                       READY     STATUS    RESTARTS   AGE
+trident-6cb59bb5fb-xdvxs   2/2       Running   4          3d
+[root@rhel3 ~]# kubectl get pods --all-namespaces
+NAMESPACE     NAME                            READY     STATUS    RESTARTS   AGE
+kube-system   etcd-rhel3                      1/1       Running   2          3d
+kube-system   kube-apiserver-rhel3            1/1       Running   2          3d
+kube-system   kube-controller-manager-rhel3   1/1       Running   2          3d
+kube-system   kube-dns-86f4d74b45-k5xdt       3/3       Running   6          3d
+kube-system   kube-flannel-ds-cz2mq           1/1       Running   2          3d
+kube-system   kube-flannel-ds-hw5zr           1/1       Running   2          3d
+kube-system   kube-flannel-ds-mvd9p           1/1       Running   4          3d
+kube-system   kube-proxy-5qlxd                1/1       Running   2          3d
+kube-system   kube-proxy-5xwkm                1/1       Running   2          3d
+kube-system   kube-proxy-98x5z                1/1       Running   4          3d
+kube-system   kube-scheduler-rhel3            1/1       Running   2          3d
+trident       trident-6cb59bb5fb-xdvxs        2/2       Running   4          3d
+[root@rhel3 ~]# kubectl get deployment -n trident
+NAME      DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+trident   1         1         1            1           3d
+[root@rhel3 ~]# kubectl describe deployment trident
+Error from server (NotFound): deployments.extensions "trident" not found
+[root@rhel3 ~]# kubectl describe de^Coyment trident
+[root@rhel3 ~]# kubectl get deployment
+No resources found.
+[root@rhel3 ~]# kubectl get deployment -n trident
+NAME      DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+trident   1         1         1            1           3d
+[root@rhel3 ~]# kubectl describe deployment trident -n trident
+Name:                   trident
+Namespace:              trident
+CreationTimestamp:      Sat, 09 Jun 2018 15:46:44 +0000
+Labels:                 app=trident.netapp.io
+Annotations:            deployment.kubernetes.io/revision=1
+Selector:               app=trident.netapp.io
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  1 max unavailable, 1 max surge
+Pod Template:
+  Labels:           app=trident.netapp.io
+  Service Account:  trident
+  Containers:
+   trident-main:
+    Image:      netapp/trident:18.04.0
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      /usr/local/bin/trident_orchestrator
+    Args:
+      -etcd_v3
+      http://127.0.0.1:8001
+      -k8s_pod
+      -debug
+    Environment:  <none>
+    Mounts:       <none>
+   etcd:
+    Image:      quay.io/coreos/etcd:v3.1.5
+    Port:       <none>
+    Host Port:  <none>
+    Command:
+      /usr/local/bin/etcd
+    Args:
+      -name
+      etcd1
+      -advertise-client-urls
+      http://127.0.0.1:8001
+      -listen-client-urls
+      http://127.0.0.1:8001
+      -initial-advertise-peer-urls
+      http://127.0.0.1:8002
+      -listen-peer-urls
+      http://127.0.0.1:8002
+      -data-dir
+      /var/etcd/data
+      -initial-cluster
+      etcd1=http://127.0.0.1:8002
+    Environment:  <none>
+    Mounts:
+      /var/etcd/data from etcd-vol (rw)
+  Volumes:
+   etcd-vol:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  trident
+    ReadOnly:   false
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   trident-6cb59bb5fb (1/1 replicas created)
+Events:          <none>
+[root@rhel3 ~]# kubectl get pvc -n trident
+NAME      STATUS    VOLUME    CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+trident   Bound     trident   2Gi        RWO                           3d
+[root@rhel3 ~]# kubectl get pv -n trident
+NAME      CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM             STORAGECLASS   REASON    AGE
+trident   2Gi        RWO            Retain           Bound     trident/trident                            3d
+[root@rhel3 ~]# kubectl describe pv trident
+Name:            trident
+Labels:          app=trident.netapp.io
+Annotations:     pv.kubernetes.io/bound-by-controller=yes
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:
+Status:          Bound
+Claim:           trident/trident
+Reclaim Policy:  Retain
+Access Modes:    RWO
+Capacity:        2Gi
+Node Affinity:   <none>
+Message:
+Source:
+    Type:      NFS (an NFS mount that lasts the lifetime of a pod)
+    Server:    192.168.0.132
+    Path:      /trident_trident
+    ReadOnly:  false
+Events:        <none>
+[root@rhel3 ~]# cd ls
+-bash: cd: ls: No such file or directory
+[root@rhel3 ~]# cd
+[root@rhel3 ~]# ls
+bkup  k8s  sc_412  trident-installer
+[root@rhel3 ~]# cd k8s/
+[root@rhel3 k8s]# ls
+alpine2.yaml  backend.json      backend-sf.json    pv-alpine_base.yaml   pv-alpine.yaml       pvcfornas.yaml        pvcforssd.yaml          scale-pod.yaml  sc-solidfire.yaml  sc-storagepool.yaml
+alpine.yaml   backend-nas.json  failover-pod.yaml  pv-alpine-clone.yaml  pvcfornasclone.yaml  pvcforsolidfire.yaml  pvcforstoragepool.yaml  sc-nas.yaml     sc-ssd.yaml        trident
+[root@rhel3 k8s]# cat k8s/alpine.yaml
+cat: k8s/alpine.yaml: No such file or directory
+[root@rhel3 k8s]# cd ..
+[root@rhel3 ~]# cat k8s/alpine.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: alpine
+  namespace: default
+spec:
+  containers:
+  - image: alpine:3.2
+    command:
+      - /bin/sh
+      - "-c"
+      - "sleep 60m"
+    imagePullPolicy: IfNotPresent
+    name: alpine
+  restartPolicy: Always
+[root@rhel3 ~]# kubectl create -f k8s/alpine.yaml
+pod "alpine" created
+[root@rhel3 ~]# kubectl get pod
+NAME      READY     STATUS    RESTARTS   AGE
+alpine    1/1       Running   0          15s
+[root@rhel3 ~]# kubectl describe pod alpine
+Name:         alpine
+Namespace:    default
+Node:         rhel1/192.168.0.61
+Start Time:   Wed, 13 Jun 2018 04:58:44 +0000
+Labels:       <none>
+Annotations:  <none>
+Status:       Running
+IP:           10.244.2.4
+Containers:
+  alpine:
+    Container ID:  docker://1b68252c70094733cd5733383793d8486839055ef36bd90557f8eb198c20aa2b
+    Image:         alpine:3.2
+    Image ID:      docker-pullable://alpine@sha256:99cddbd4a737f7652412404fb75ef5b7490200ffe304c4d781bc8edfb3679c98
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /bin/sh
+      -c
+      sleep 60m
+    State:          Running
+      Started:      Wed, 13 Jun 2018 04:58:50 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-ss6wq (ro)
+Conditions:
+  Type           Status
+  Initialized    True
+  Ready          True
+  PodScheduled   True
+Volumes:
+  default-token-ss6wq:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-ss6wq
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason                 Age   From               Message
+  ----    ------                 ----  ----               -------
+  Normal  Scheduled              40s   default-scheduler  Successfully assigned alpine to rhel1
+  Normal  SuccessfulMountVolume  39s   kubelet, rhel1     MountVolume.SetUp succeeded for volume "default-token-ss6wq"
+  Normal  Pulling                37s   kubelet, rhel1     pulling image "alpine:3.2"
+  Normal  Pulled                 35s   kubelet, rhel1     Successfully pulled image "alpine:3.2"
+  Normal  Created                34s   kubelet, rhel1     Created container
+  Normal  Started                34s   kubelet, rhel1     Started container
+[root@rhel3 ~]# kubectl delete pod alpine
+pod "alpine" deleted
+[root@rhel3 ~]# kubectl get sc
+NAME                        PROVISIONER         AGE
+storage-class-nas           netapp.io/trident   3d
+storage-class-solidfire     netapp.io/trident   3d
+storage-class-ssd           netapp.io/trident   3d
+storage-class-storagepool   netapp.io/trident   3d
+[root@rhel3 ~]# kubectl describe sc storage-class-nas
+Name:                  storage-class-nas
+IsDefaultClass:        No
+Annotations:           <none>
+Provisioner:           netapp.io/trident
+Parameters:            backendType=ontap-nas
+AllowVolumeExpansion:  <unset>
+MountOptions:          <none>
+ReclaimPolicy:         Delete
+VolumeBindingMode:     Immediate
+Events:                <none>
+[root@rhel3 ~]# ls k8s/
+alpine2.yaml  backend.json      backend-sf.json    pv-alpine_base.yaml   pv-alpine.yaml       pvcfornas.yaml        pvcforssd.yaml          scale-pod.yaml  sc-solidfire.yaml  sc-storagepool.yaml
+alpine.yaml   backend-nas.json  failover-pod.yaml  pv-alpine-clone.yaml  pvcfornasclone.yaml  pvcforsolidfire.yaml  pvcforstoragepool.yaml  sc-nas.yaml     sc-ssd.yaml        trident
+[root@rhel3 ~]# cat k8s/pvcfornas.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: persistent-volume-claim-nas
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: storage-class-nas
+[root@rhel3 ~]# kubectl create -f k8s/pvcfornas.yaml
+persistentvolumeclaim "persistent-volume-claim-nas" created
+[root@rhel3 ~]# kubectl get pvc
+NAME                          STATUS    VOLUME                                      CAPACITY   ACCESS MODES   STORAGECLASS        AGE
+persistent-volume-claim-nas   Bound     default-persistent-volume-claim-nas-28117   1Gi        RWO            storage-class-nas   31s
+[root@rhel3 ~]# kubectl describe pv  default-persistent-volume-claim-nas-28117
+Name:            default-persistent-volume-claim-nas-28117
+Labels:          <none>
+Annotations:     pv.kubernetes.io/provisioned-by=netapp.io/trident
+                 volume.beta.kubernetes.io/storage-class=storage-class-nas
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:    storage-class-nas
+Status:          Bound
+Claim:           default/persistent-volume-claim-nas
+Reclaim Policy:  Delete
+Access Modes:    RWO
+Capacity:        1Gi
+Node Affinity:   <none>
+Message:
+Source:
+    Type:      NFS (an NFS mount that lasts the lifetime of a pod)
+    Server:    192.168.0.132
+    Path:      /trident_default_persistent_volume_claim_nas_28117
+    ReadOnly:  false
+Events:        <none>
+[root@rhel3 ~]# volume show -vserver svm1
+-bash: volume: command not found
+[root@rhel3 ~]# cat k8s/pv-alpine.yaml
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pvpod
+spec:
+  volumes:
+    - name: task-pv-storage
+      persistentVolumeClaim:
+       claimName: persistent-volume-claim-nas
+  containers:
+    - name: task-pv-container
+      image: alpine:3.2
+      command:
+        - /bin/sh
+        - "-c"
+        - "sleep 60m"
+      volumeMounts:
+        - mountPath: "/data"
+          name: task-pv-storage
+[root@rhel3 ~]# kubectl create -f k8s/pv-alpine.yaml
+pod "pvpod" created
+[root@rhel3 ~]# kubectl get pod
+NAME      READY     STATUS    RESTARTS   AGE
+pvpod     1/1       Running   0          33s
+[root@rhel3 ~]# kubectl exec -it pvpod /bin/sh
+/ # mount | grep /data
+192.168.0.132:/trident_default_persistent_volume_claim_nas_28117 on /data type nfs (rw,relatime,vers=3,rsize=65536,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=192.168.0.132,mountvers=3,mountport=635,mountproto=udp,local_lock=none,addr=192.168.0.132)
+/ # kubectl delete pod alpine
+/ # exit
+[root@rhel3 ~]# kubectl delete pod alpine
+Error from server (NotFound): pods "alpine" not found
+[root@rhel3 ~]# kubectl delete pod pvpod
+pod "pvpod" deleted
+[root@rhel3 ~]#

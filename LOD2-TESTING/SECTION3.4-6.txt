@@ -1,0 +1,37 @@
+login as: root
+root@rhel6.demo.netapp.com's password:
+Last login: Wed Jun 13 03:42:23 2018 from jumphost.demo.netapp.com
+[root@rhel6 ~]#
+[root@rhel6 ~]#
+[root@rhel6 ~]#
+[root@rhel6 ~]# docker plugin install netapp/trident-plugin:18.04 --alias netapp --grant-all-permissions
+18.04: Pulling from netapp/trident-plugin
+034317db844f: Download complete
+Digest: sha256:845065dee9abd6ea0a80720974faf9dc08f8f978f9a00ab6e0a20ce662862073
+Status: Downloaded newer image for netapp/trident-plugin:18.04
+Installed plugin netapp/trident-plugin:18.04
+[root@rhel6 ~]# docler plugin ls
+-bash: docler: command not found
+[root@rhel6 ~]# docker plugin ls
+ID                  NAME                DESCRIPTION                             ENABLED
+5b7630e8b43e        netapp:latest       Trident - NetApp Docker Volume Plugin   true
+[root@rhel6 ~]# docker run -it --name mycont2 -v my_data:/data busybox /bin/sh
+Unable to find image 'busybox:latest' locally
+latest: Pulling from library/busybox
+07a152489297: Pull complete
+Digest: sha256:141c253bc4c3fd0a201d32dc1f493bcf3fff003b6df416dea4f41046e0f37d47
+Status: Downloaded newer image for busybox:latest
+/ # ls -al /data
+total 4
+drwxrwxrwx    2 root     root          4096 Jun 13 04:13 .
+drwxr-xr-x   13 root     root           137 Jun 13 04:22 ..
+-rw-r--r--    1 root     root            29 Jun 13 04:13 test.txt
+/ # cat test.txt
+cat: can't open 'test.txt': No such file or directory
+/ # cd /data
+/data # cat test.txt
+Wed Jun 13 04:13:46 UTC 2018
+/data # exit
+[root@rhel6 ~]# docker rm mycont2
+mycont2
+[root@rhel6 ~]#

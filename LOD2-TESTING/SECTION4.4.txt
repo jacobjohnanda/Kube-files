@@ -1,0 +1,190 @@
+login as: root
+root@rhel3.demo.netapp.com's password:
+Last login: Wed Jun 13 04:50:27 2018 from jumphost.demo.netapp.com
+[root@rhel3 ~]# kubectl get sc
+NAME                        PROVISIONER         AGE
+storage-class-nas           netapp.io/trident   3d
+storage-class-solidfire     netapp.io/trident   3d
+storage-class-ssd           netapp.io/trident   3d
+storage-class-storagepool   netapp.io/trident   3d
+[root@rhel3 ~]# kubectl describe sc persistent-volume-claim-nas
+Error from server (NotFound): storageclasses.storage.k8s.io "persistent-volume-claim-nas" not found
+[root@rhel3 ~]# ^C
+[root@rhel3 ~]# kubectl describe sc storage-class-nas
+Name:                  storage-class-nas
+IsDefaultClass:        No
+Annotations:           <none>
+Provisioner:           netapp.io/trident
+Parameters:            backendType=ontap-nas
+AllowVolumeExpansion:  <unset>
+MountOptions:          <none>
+ReclaimPolicy:         Delete
+VolumeBindingMode:     Immediate
+Events:                <none>
+[root@rhel3 ~]# cat k8s/pvcfornas.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: persistent-volume-claim-nas
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: storage-class-nas
+[root@rhel3 ~]# kubectl create -f pvcfornas.yaml
+error: the path "pvcfornas.yaml" does not exist
+[root@rhel3 ~]# kubectl create -f k8s/pvcfornas.yaml
+Error from server (AlreadyExists): error when creating "k8s/pvcfornas.yaml": persistentvolumeclaims "persistent-volume-claim-nas" already exists
+[root@rhel3 ~]# kubectl delete -f k8s/pvcfornas.yaml
+persistentvolumeclaim "persistent-volume-claim-nas" deleted
+[root@rhel3 ~]# kubectl create -f k8s/pvcfornas.yaml
+persistentvolumeclaim "persistent-volume-claim-nas" created
+[root@rhel3 ~]# kubectl  get pvc
+NAME                          STATUS    VOLUME                                      CAPACITY   ACCESS MODES   STORAGECLASS        AGE
+persistent-volume-claim-nas   Bound     default-persistent-volume-claim-nas-5a491   1Gi        RWO            storage-class-nas   23s
+[root@rhel3 ~]# kubectl describe pv  default-persistent-volume-claim-nas-5a491
+Name:            default-persistent-volume-claim-nas-5a491
+Labels:          <none>
+Annotations:     pv.kubernetes.io/provisioned-by=netapp.io/trident
+                 volume.beta.kubernetes.io/storage-class=storage-class-nas
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:    storage-class-nas
+Status:          Bound
+Claim:           default/persistent-volume-claim-nas
+Reclaim Policy:  Delete
+Access Modes:    RWO
+Capacity:        1Gi
+Node Affinity:   <none>
+Message:
+Source:
+    Type:      NFS (an NFS mount that lasts the lifetime of a pod)
+    Server:    192.168.0.132
+    Path:      /trident_default_persistent_volume_claim_nas_5a491
+    ReadOnly:  false
+Events:        <none>
+[root@rhel3 ~]# cat k8s/pv-alpine.yaml
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pvpod
+spec:
+  volumes:
+    - name: task-pv-storage
+      persistentVolumeClaim:
+       claimName: persistent-volume-claim-nas
+  containers:
+    - name: task-pv-container
+      image: alpine:3.2
+      command:
+        - /bin/sh
+        - "-c"
+        - "sleep 60m"
+      volumeMounts:
+        - mountPath: "/data"
+          name: task-pv-storage
+[root@rhel3 ~]# kubectl create -f k8s/pv-alpine.yaml
+pod "pvpod" created
+[root@rhel3 ~]# kubectl get pod
+NAME      READY     STATUS    RESTARTS   AGE
+pvpod     1/1       Running   0          13s
+[root@rhel3 ~]# kubectl exec -it pvpod /bin/sh
+/ # mount | grep /data
+192.168.0.132:/trident_default_persistent_volume_claim_nas_5a491 on /data type nfs (rw,relatime,vers=3,rsize=65536,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=192.168.0.132,mountvers=3,mountport=635,mountproto=udp,local_lock=none,addr=192.168.0.132)
+/ # cd /data
+/data # echo "THIS IS A TEST FILE" > testfile.txt
+/data # ls
+testfile.txt
+/data # cat testfile.txt
+THIS IS A TEST FILE
+/data # exit
+[root@rhel3 ~]# cat k8s/pvcfornasclone.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: persistent-volume-claim-clone-nas
+  annotations:
+    trident.netapp.io/cloneFromPVC: persistent-volume-claim-nas
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: storage-class-nas
+[root@rhel3 ~]# kubectl create -f  k8s/pvcfornasclone.yaml
+persistentvolumeclaim "persistent-volume-claim-clone-nas" created
+[root@rhel3 ~]# kubectl get pvc
+NAME                                STATUS    VOLUME                                            CAPACITY   ACCESS MODES   STORAGECLASS        AGE
+persistent-volume-claim-clone-nas   Bound     default-persistent-volume-claim-clone-nas-adfeb   1Gi        RWO            storage-class-nas   26s
+persistent-volume-claim-nas         Bound     default-persistent-volume-claim-nas-5a491         1Gi        RWO            storage-class-nas   9m
+[root@rhel3 ~]# kubectl describe pv  default-persistent-volume-claim-clone-nas-adfeb
+Name:            default-persistent-volume-claim-clone-nas-adfeb
+Labels:          <none>
+Annotations:     pv.kubernetes.io/provisioned-by=netapp.io/trident
+                 volume.beta.kubernetes.io/storage-class=storage-class-nas
+Finalizers:      [kubernetes.io/pv-protection]
+StorageClass:    storage-class-nas
+Status:          Bound
+Claim:           default/persistent-volume-claim-clone-nas
+Reclaim Policy:  Delete
+Access Modes:    RWO
+Capacity:        1Gi
+Node Affinity:   <none>
+Message:
+Source:
+    Type:      NFS (an NFS mount that lasts the lifetime of a pod)
+    Server:    192.168.0.132
+    Path:      /trident_default_persistent_volume_claim_clone_nas_adfeb
+    ReadOnly:  false
+Events:        <none>
+[root@rhel3 ~]# cat k8s/pv-alpine-clone.yaml
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pvpod-clone
+spec:
+  volumes:
+    - name: task-pv-clone-storage
+      persistentVolumeClaim:
+       claimName: persistent-volume-claim-clone-nas
+  containers:
+    - name: task-pv-clone-container
+      image: alpine:3.2
+      command:
+        - /bin/sh
+        - "-c"
+        - "sleep 60m"
+      volumeMounts:
+        - mountPath: "/data"
+          name: task-pv-clone-storage
+[root@rhel3 ~]# kubectl create -f k8s/pv-alpine-clone.yaml
+pod "pvpod-clone" created
+[root@rhel3 ~]# kubectl get pod
+NAME          READY     STATUS    RESTARTS   AGE
+pvpod         1/1       Running   0          9m
+pvpod-clone   1/1       Running   0          18s
+[root@rhel3 ~]# kubectl exec -it pvpod-clone /bin/sh
+/ # mount | grep /data
+192.168.0.132:/trident_default_persistent_volume_claim_clone_nas_adfeb on /data type nfs (rw,relatime,vers=3,rsize=65536,wsize=65536,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=192.168.0.132,mountvers=3,mountport=635,mountproto=udp,local_lock=none,addr=192.168.0.132)
+/ # cd /data
+/data # ls
+testfile.txt
+/data # cat testfile.txt
+THIS IS A TEST FILE
+/data # exit
+[root@rhel3 ~]# kubectl delete pod pvpod
+pod "pvpod" deleted
+[root@rhel3 ~]# kubectl delete pod pvpod-clone
+pod "pvpod-clone" deleted
+[root@rhel3 ~]# kubectl delete pvc persistent-volume-claim-clone-nas
+persistentvolumeclaim "persistent-volume-claim-clone-nas" deleted
+[root@rhel3 ~]# kubectl delete pvc persistent-volume-claim-nas
+persistentvolumeclaim "persistent-volume-claim-nas" deleted
+[root@rhel3 ~]#
+[root@rhel3 ~]#
+[root@rhel3 ~]#
+[root@rhel3 ~]#
+[root@rhel3 ~]#
+[root@rhel3 ~]#

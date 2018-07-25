@@ -1,0 +1,259 @@
+login as: root
+root@rhel5.demo.netapp.com's password:
+Last login: Tue Jun 12 05:39:42 2018 from jumphost.demo.netapp.com
+[root@rhel5 ~]# docker
+
+Usage:  docker COMMAND
+
+A self-sufficient runtime for containers
+
+Options:
+      --config string      Location of client config files (default "/root/.docker")
+  -D, --debug              Enable debug mode
+      --help               Print usage
+  -H, --host list          Daemon socket(s) to connect to (default [])
+  -l, --log-level string   Set the logging level ("debug", "info", "warn", "error", "fatal") (default "info")
+      --tls                Use TLS; implied by --tlsverify
+      --tlscacert string   Trust certs signed only by this CA (default "/root/.docker/ca.pem")
+      --tlscert string     Path to TLS certificate file (default "/root/.docker/cert.pem")
+      --tlskey string      Path to TLS key file (default "/root/.docker/key.pem")
+      --tlsverify          Use TLS and verify the remote
+  -v, --version            Print version information and quit
+
+Management Commands:
+  container   Manage containers
+  image       Manage images
+  network     Manage networks
+  node        Manage Swarm nodes
+  plugin      Manage plugins
+  secret      Manage Docker secrets
+  service     Manage services
+  stack       Manage Docker stacks
+  swarm       Manage Swarm
+  system      Manage Docker
+  volume      Manage volumes
+
+Commands:
+  attach      Attach to a running container
+  build       Build an image from a Dockerfile
+  commit      Create a new image from a container's changes
+  cp          Copy files/folders between a container and the local filesystem
+  create      Create a new container
+  diff        Inspect changes to files or directories on a container's filesystem
+  events      Get real time events from the server
+  exec        Run a command in a running container
+  export      Export a container's filesystem as a tar archive
+  history     Show the history of an image
+  images      List images
+  import      Import the contents from a tarball to create a filesystem image
+  info        Display system-wide information
+  inspect     Return low-level information on Docker objects
+  kill        Kill one or more running containers
+  load        Load an image from a tar archive or STDIN
+  login       Log in to a Docker registry
+  logout      Log out from a Docker registry
+  logs        Fetch the logs of a container
+  pause       Pause all processes within one or more containers
+  port        List port mappings or a specific mapping for the container
+  ps          List containers
+  pull        Pull an image or a repository from a registry
+  push        Push an image or a repository to a registry
+  rename      Rename a container
+  restart     Restart one or more containers
+  rm          Remove one or more containers
+  rmi         Remove one or more images
+  run         Run a command in a new container
+  save        Save one or more images to a tar archive (streamed to STDOUT by default)
+  search      Search the Docker Hub for images
+  start       Start one or more stopped containers
+  stats       Display a live stream of container(s) resource usage statistics
+  stop        Stop one or more running containers
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+  top         Display the running processes of a container
+  unpause     Unpause all processes within one or more containers
+  update      Update configuration of one or more containers
+  version     Show the Docker version information
+  wait        Block until one or more containers stop, then print their exit codes
+
+Run 'docker COMMAND --help' for more information on a command.
+[root@rhel5 ~]# docker version
+Client:
+ Version:      17.03.0-ce
+ API version:  1.26
+ Go version:   go1.7.5
+ Git commit:   3a232c8
+ Built:        Tue Feb 28 08:10:07 2017
+ OS/Arch:      linux/amd64
+
+Server:
+ Version:      17.03.0-ce
+ API version:  1.26 (minimum version 1.12)
+ Go version:   go1.7.5
+ Git commit:   3a232c8
+ Built:        Tue Feb 28 08:10:07 2017
+ OS/Arch:      linux/amd64
+ Experimental: false
+[root@rhel5 ~]# it codes
+-bash: it: command not found
+[root@rhel5 ~]#
+[root@rhel5 ~]# docker info
+Containers: 0
+ Running: 0
+ Paused: 0
+ Stopped: 0
+Images: 0
+Server Version: 17.03.0-ce
+Storage Driver: devicemapper
+ Pool Name: docker-253:1-998953-pool
+ Pool Blocksize: 65.54 kB
+ Base Device Size: 107.4 GB
+ Backing Filesystem: xfs
+ Data file: /dev/loop0
+ Metadata file: /dev/loop1
+ Data Space Used: 53.74 MB
+ Data Space Total: 107.4 GB
+ Data Space Available: 37 GB
+ Metadata Space Used: 606.2 kB
+ Metadata Space Total: 2.147 GB
+ Metadata Space Available: 2.147 GB
+ Thin Pool Minimum Free Space: 10.74 GB
+ Udev Sync Supported: true
+ Deferred Removal Enabled: false
+ Deferred Deletion Enabled: false
+ Deferred Deleted Device Count: 0
+ Data loop file: /var/lib/docker/devicemapper/devicemapper/data
+ WARNING: Usage of loopback devices is strongly discouraged for production use. Use `--storage-opt dm.thinpooldev` to specify a custom block storage device.
+ Metadata loop file: /var/lib/docker/devicemapper/devicemapper/metadata
+ Library Version: 1.02.135-RHEL7 (2016-09-28)
+Logging Driver: json-file
+Cgroup Driver: cgroupfs
+Plugins:
+ Volume: local
+ Network: bridge host macvlan null overlay
+Swarm: inactive
+Runtimes: runc
+Default Runtime: runc
+Init Binary: docker-init
+containerd version: 977c511eda0925a723debdc94d09459af49d082a
+runc version: a01dafd48bc1c7cc12bdb01206f9fea7dd6feb70
+init version: 949e6fa
+Security Options:
+ seccomp
+  Profile: default
+Kernel Version: 3.10.0-514.el7.x86_64
+Operating System: Red Hat Enterprise Linux Server 7.3 (Maipo)
+OSType: linux
+Architecture: x86_64
+CPUs: 2
+Total Memory: 1.797 GiB
+Name: rhel5
+ID: KLKY:4YCQ:3B25:FVJB:J2QX:O34Z:KTH5:QQIZ:5HBQ:WD7Z:ZW7F:UMWD
+Docker Root Dir: /var/lib/docker
+Debug Mode (client): false
+Debug Mode (server): false
+Registry: https://index.docker.io/v1/
+Experimental: false
+Insecure Registries:
+ registry.demo.netapp.com
+ 127.0.0.0/8
+Live Restore Enabled: false
+[root@rhel5 ~]# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+[root@rhel5 ~]# docker pull httpd:2.2
+2.2: Pulling from library/httpd
+f49cf87b52c1: Pull complete
+24b1e09cbcb7: Pull complete
+8a4e0d64e915: Pull complete
+bcbe0eb4ca51: Pull complete
+16e370c15d38: Pull complete
+Digest: sha256:9784d70c8ea466fabd52b0bc8cde84980324f9612380d22fbad2151df9a430eb
+Status: Downloaded newer image for httpd:2.2
+[root@rhel5 ~]# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+httpd               2.2                 e06c3dbbfe23        4 months ago        171 MB
+[root@rhel5 ~]# docker run -d --name my_www httpd:2.2
+0d1bb1ae34259e0e9a332d638ab4df0b1fad44ebb09bd709c0a7aaec6ceb3676
+[root@rhel5 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND              CREATED             STATUS              PORTS               NAMES
+0d1bb1ae3425        httpd:2.2           "httpd-foreground"   13 seconds ago      Up 12 seconds       80/tcp              my_www
+[root@rhel5 ~]# docker logs my_www
+httpd: Could not reliably determine the server's fully qualified domain name, using 172.17.0.2 for ServerName
+[Wed Jun 13 02:56:02 2018] [warn] Init: Session Cache is not configured [hint: SSLSessionCache]
+httpd: Could not reliably determine the server's fully qualified domain name, using 172.17.0.2 for ServerName
+[Wed Jun 13 02:56:02 2018] [notice] Digest: generating secret for digest authentication ...
+[Wed Jun 13 02:56:02 2018] [notice] Digest: done
+[Wed Jun 13 02:56:03 2018] [notice] Apache/2.2.34 (Unix) mod_ssl/2.2.34 OpenSSL/1.0.1t DAV/2 configured -- resuming normal operations
+[root@rhel5 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND              CREATED             STATUS              PORTS               NAMES
+0d1bb1ae3425        httpd:2.2           "httpd-foreground"   2 minutes ago       Up 2 minutes        80/tcp              my_www
+[root@rhel5 ~]# docker stop 0d1bb1ae3425
+0d1bb1ae3425
+[root@rhel5 ~]# docker run -d --name my_www httpd:2.2
+docker: Error response from daemon: Conflict. The container name "/my_www" is already in use by container 0d1bb1ae34259e0e9a332d638ab4df0b1fad44ebb09bd709c0a7aaec6ceb3676. You have to remove (or rename) that container to be able to reuse that name..
+See 'docker run --help'.
+[root@rhel5 ~]# docker run 0d1bb1ae3425
+Unable to find image '0d1bb1ae3425:latest' locally
+docker: Error response from daemon: repository 0d1bb1ae3425 not found: does not exist or no pull access.
+See 'docker run --help'.
+[root@rhel5 ~]# docker start 0d1bb1ae3425
+0d1bb1ae3425
+[root@rhel5 ~]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND              CREATED             STATUS              PORTS               NAMES
+0d1bb1ae3425        httpd:2.2           "httpd-foreground"   5 minutes ago       Up 22 seconds       80/tcp              my_www
+[root@rhel5 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND              CREATED             STATUS              PORTS               NAMES
+0d1bb1ae3425        httpd:2.2           "httpd-foreground"   7 minutes ago       Up About a minute   80/tcp              my_www
+[root@rhel5 ~]# docker stop my_www
+my_www
+[root@rhel5 ~]# docker rm my_www
+my_www
+[root@rhel5 ~]# docker run -d --name my_www -p 80:80 httpd:2.2
+2c42eea64151c54c4f23747c018ed13a2e297db3ea27571287b7b61c9070bd54
+[root@rhel5 ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND              CREATED             STATUS              PORTS                NAMES
+2c42eea64151        httpd:2.2           "httpd-foreground"   12 seconds ago      Up 11 seconds       0.0.0.0:80->80/tcp   my_www
+[root@rhel5 ~]# docker exec -it my_www /bin/bash
+root@2c42eea64151:/usr/local/apache2# cd /usr/local/apache2/htdocs
+root@2c42eea64151:/usr/local/apache2/htdocs# ls
+index.html
+root@2c42eea64151:/usr/local/apache2/htdocs# cat index.html
+<html><body><h1>It works!</h1></body></html>root@2c42eea64151:/usr/local/apache2/htdocs#
+root@2c42eea64151:/usr/local/apache2/htdocs# echo
+
+root@2c42eea64151:/usr/local/apache2/htdocs#
+root@2c42eea64151:/usr/local/apache2/htdocs# '<h1>Connect Clouds with the NetApp Data Fabric!</h1>' > index.html
+bash: <h1>Connect Clouds with the NetApp Data Fabric!</h1>: No such file or directory
+root@2c42eea64151:/usr/local/apache2/htdocs# cat index.html
+root@2c42eea64151:/usr/local/apache2/htdocs# echo '<h1>Connect Clouds with the NetApp Data Fabric!</h1>' > index.html
+root@2c42eea64151:/usr/local/apache2/htdocs# cat index.html
+<h1>Connect Clouds with the NetApp Data Fabric!</h1>
+root@2c42eea64151:/usr/local/apache2/htdocs# exit
+exit
+[root@rhel5 ~]# docker stop my_www
+my_www
+[root@rhel5 ~]# docker start my_www
+my_www
+[root@rhel5 ~]# docker stop my_www && docker rm my_www
+my_www
+my_www
+[root@rhel5 ~]# docker run -d --name my_www -p 80:80 httpd:latest
+Unable to find image 'httpd:latest' locally
+latest: Pulling from library/httpd
+3d77ce4481b1: Pull complete
+73674f4d9403: Pull complete
+d266646f40bd: Pull complete
+ce7b0dda0c9f: Pull complete
+01729050d692: Pull complete
+014246127c67: Pull complete
+7cd2e04cf570: Pull complete
+Digest: sha256:72f2b4aa99235509146bd12054d1a93c1c869ba60212d21729118c93ca4305d3
+Status: Downloaded newer image for httpd:latest
+05624dd9cd494155398a8ad53a4e3373d7d4d082977c4d4499c17440454a0a26
+[root@rhel5 ~]# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+httpd               latest              fb2f3851a971        6 weeks ago         177 MB
+httpd               2.2                 e06c3dbbfe23        4 months ago        171 MB
+[root@rhel5 ~]# docker stop my_www && docker rm my_www
+my_www
+my_www
+[root@rhel5 ~]#

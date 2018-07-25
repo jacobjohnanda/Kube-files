@@ -1,0 +1,329 @@
+login as: admin
+Using keyboard-interactive authentication.
+Password:
+cluster1::>
+cluster1::>
+cluster1::> volume show -vserver svm1
+Vserver   Volume       Aggregate    State      Type       Size  Available Used%
+--------- ------------ ------------ ---------- ---- ---------- ---------- -----
+svm1      registry     aggr1        online     RW         20GB    18.91GB    5%
+svm1      svm1_root    aggr1        online     RW         20MB    17.82MB   10%
+svm1      trident_default_persistent_volume_claim_nas_28117
+                       aggr1        online     RW          1GB    972.6MB    5%
+svm1      trident_trident
+                       aggr1        online     RW          2GB     1.90GB    5%
+svm1      www          aggr1        online     RW          5GB     4.75GB    5%
+5 entries were displayed.
+
+cluster1::> volume show -vserver svm1 -junction
+                                Junction                            Junction
+Vserver   Volume       Language Active    Junction Path             Path Source
+--------- ------------ -------- --------  ------------------------- -----------
+svm1      registry     C.UTF-8  true      /registry                 RW_volume
+svm1      svm1_root    C.UTF-8  true      /                         -
+svm1      trident_default_persistent_volume_claim_nas_28117
+                       C.UTF-8  true      /trident_default_         RW_volume
+                                          persistent_volume_claim_
+                                          nas_28117
+svm1      trident_trident
+                       C.UTF-8  true      /trident_trident          RW_volume
+svm1      www          C.UTF-8  true      /www                      RW_volume
+5 entries were displayed.
+
+cluster1::> volume show -vserver svm1
+Vserver   Volume       Aggregate    State      Type       Size  Available Used%
+--------- ------------ ------------ ---------- ---- ---------- ---------- -----
+svm1      registry     aggr1        online     RW         20GB    18.91GB    5%
+svm1      svm1_root    aggr1        online     RW         20MB    17.74MB   11%
+svm1      trident_default_persistent_volume_claim_nas_5a491
+                       aggr2        online     RW          1GB    972.6MB    5%
+svm1      trident_trident
+                       aggr1        online     RW          2GB     1.90GB    5%
+svm1      www          aggr1        online     RW          5GB     4.75GB    5%
+5 entries were displayed.
+
+cluster1::> volume show -vserver svm1 -junction
+                                Junction                            Junction
+Vserver   Volume       Language Active    Junction Path             Path Source
+--------- ------------ -------- --------  ------------------------- -----------
+svm1      registry     C.UTF-8  true      /registry                 RW_volume
+svm1      svm1_root    C.UTF-8  true      /                         -
+svm1      trident_default_persistent_volume_claim_nas_5a491
+                       C.UTF-8  true      /trident_default_         RW_volume
+                                          persistent_volume_claim_
+                                          nas_5a491
+svm1      trident_trident
+                       C.UTF-8  true      /trident_trident          RW_volume
+svm1      www          C.UTF-8  true      /www                      RW_volume
+5 entries were displayed.
+
+cluster1::> volume show -vserver svm1
+Vserver   Volume       Aggregate    State      Type       Size  Available Used%
+--------- ------------ ------------ ---------- ---- ---------- ---------- -----
+svm1      registry     aggr1        online     RW         20GB    18.91GB    5%
+svm1      svm1_root    aggr1        online     RW         20MB    17.72MB   11%
+svm1      trident_default_persistent_volume_claim_clone_nas_adfeb
+                       aggr2        online     RW          1GB    972.6MB    5%
+svm1      trident_default_persistent_volume_claim_nas_5a491
+                       aggr2        online     RW          1GB    972.6MB    5%
+svm1      trident_trident
+                       aggr1        online     RW          2GB     1.90GB    5%
+svm1      www          aggr1        online     RW          5GB     4.75GB    5%
+6 entries were displayed.
+
+cluster1::> volume show -vserver svm1 -junction
+                                Junction                            Junction
+Vserver   Volume       Language Active    Junction Path             Path Source
+--------- ------------ -------- --------  ------------------------- -----------
+svm1      registry     C.UTF-8  true      /registry                 RW_volume
+svm1      svm1_root    C.UTF-8  true      /                         -
+svm1      trident_default_persistent_volume_claim_clone_nas_adfeb
+                       C.UTF-8  true      /trident_default_         RW_volume
+                                          persistent_volume_claim_
+                                          clone_nas_adfeb
+svm1      trident_default_persistent_volume_claim_nas_5a491
+                       C.UTF-8  true      /trident_default_         RW_volume
+                                          persistent_volume_claim_
+                                          nas_5a491
+svm1      trident_trident
+                       C.UTF-8  true      /trident_trident          RW_volume
+svm1      www          C.UTF-8  true      /www                      RW_volume
+6 entries were displayed.
+
+cluster1::> vol show -vserver svm1
+Vserver   Volume       Aggregate    State      Type       Size  Available Used%
+--------- ------------ ------------ ---------- ---- ---------- ---------- -----
+svm1      registry     aggr1        online     RW         20GB    18.91GB    5%
+svm1      svm1_root    aggr1        online     RW         20MB    17.71MB   11%
+svm1      trident_default_mongo_persistent_storage_mongodb_0_c6ae3
+                       aggr2        online     RW          1GB    952.1MB    7%
+svm1      trident_default_mongo_persistent_storage_mongodb_1_d9aa9
+                       aggr1        online     RW          1GB    952.1MB    7%
+svm1      trident_default_mongo_persistent_storage_mongodb_2_e7711
+                       aggr2        online     RW          1GB    952.1MB    7%
+svm1      trident_trident
+                       aggr1        online     RW          2GB     1.90GB    5%
+svm1      www          aggr1        online     RW          5GB     4.75GB    5%
+7 entries were displayed.
+
+cluster1::> kubectl get pvc
+
+Error: "kubectl" is not a recognized command
+
+cluster1::> vol show -vserver svm1
+Vserver   Volume       Aggregate    State      Type       Size  Available Used%
+--------- ------------ ------------ ---------- ---- ---------- ---------- -----
+svm1      registry     aggr1        online     RW         20GB    18.91GB    5%
+svm1      svm1_root    aggr1        online     RW         20MB    17.66MB   11%
+svm1      trident_default_mongo_persistent_storage_mongodb_0_c6ae3
+                       aggr2        online     RW          1GB    952.1MB    7%
+svm1      trident_default_mongo_persistent_storage_mongodb_1_d9aa9
+                       aggr1        online     RW          1GB    952.1MB    7%
+svm1      trident_default_mongo_persistent_storage_mongodb_2_e7711
+                       aggr2        online     RW          1GB    952.1MB    7%
+svm1      trident_default_mongo_persistent_storage_mongodb_3_cb8fa
+                       aggr2        online     RW          1GB    952.3MB    6%
+svm1      trident_default_mongo_persistent_storage_mongodb_4_ce954
+                       aggr1        online     RW          1GB    952.1MB    7%
+svm1      trident_trident
+                       aggr1        online     RW          2GB     1.90GB    5%
+svm1      www          aggr1        online     RW          5GB     4.75GB    5%
+9 entries were displayed.
+
+cluster1::> vol show -junction -vserver svm1
+                                Junction                            Junction
+Vserver   Volume       Language Active    Junction Path             Path Source
+--------- ------------ -------- --------  ------------------------- -----------
+svm1      registry     C.UTF-8  true      /registry                 RW_volume
+svm1      svm1_root    C.UTF-8  true      /                         -
+svm1      trident_default_mongo_persistent_storage_mongodb_0_c6ae3
+                       C.UTF-8  true      /trident_default_mongo_   RW_volume
+                                          persistent_storage_
+                                          mongodb_0_c6ae3
+svm1      trident_default_mongo_persistent_storage_mongodb_1_d9aa9
+                       C.UTF-8  true      /trident_default_mongo_   RW_volume
+                                          persistent_storage_
+                                          mongodb_1_d9aa9
+svm1      trident_default_mongo_persistent_storage_mongodb_2_e7711
+                       C.UTF-8  true      /trident_default_mongo_   RW_volume
+                                          persistent_storage_
+                                          mongodb_2_e7711
+svm1      trident_default_mongo_persistent_storage_mongodb_3_cb8fa
+                       C.UTF-8  true      /trident_default_mongo_   RW_volume
+                                          persistent_storage_
+                                          mongodb_3_cb8fa
+svm1      trident_default_mongo_persistent_storage_mongodb_4_ce954
+                       C.UTF-8  true      /trident_default_mongo_   RW_volume
+                                          persistent_storage_
+                                          mongodb_4_ce954
+
+                                Junction                            Junction
+Vserver   Volume       Language Active    Junction Path             Path Source
+--------- ------------ -------- --------  ------------------------- -----------
+svm1      trident_trident
+                       C.UTF-8  true      /trident_trident          RW_volume
+svm1      www          C.UTF-8  true      /www                      RW_volume
+9 entries were displayed.
+
+cluster1::> vol show -vserver svm1
+Vserver   Volume       Aggregate    State      Type       Size  Available Used%
+--------- ------------ ------------ ---------- ---- ---------- ---------- -----
+svm1      registry     aggr1        online     RW         20GB    18.91GB    5%
+svm1      svm1_root    aggr1        online     RW         20MB    17.58MB   12%
+svm1      trident_default_mongo_persistent_storage_mongodb_0_2b097
+                       aggr1        online     RW          1GB    952.2MB    7%
+svm1      trident_default_mongo_persistent_storage_mongodb_1_3495d
+                       aggr2        online     RW          1GB    952.2MB    7%
+svm1      trident_trident
+                       aggr1        online     RW          2GB     1.90GB    5%
+svm1      www          aggr1        online     RW          5GB     4.75GB    5%
+6 entries were displayed.
+
+cluster1::> vol show -junction -vserver svm1
+                                Junction                            Junction
+Vserver   Volume       Language Active    Junction Path             Path Source
+--------- ------------ -------- --------  ------------------------- -----------
+svm1      registry     C.UTF-8  true      /registry                 RW_volume
+svm1      svm1_root    C.UTF-8  true      /                         -
+svm1      trident_default_mongo_persistent_storage_mongodb_0_2b097
+                       C.UTF-8  true      /trident_default_mongo_   RW_volume
+                                          persistent_storage_
+                                          mongodb_0_2b097
+svm1      trident_default_mongo_persistent_storage_mongodb_1_3495d
+                       C.UTF-8  true      /trident_default_mongo_   RW_volume
+                                          persistent_storage_
+                                          mongodb_1_3495d
+svm1      trident_trident
+                       C.UTF-8  true      /trident_trident          RW_volume
+svm1      www          C.UTF-8  true      /www                      RW_volume
+6 entries were displayed.
+
+cluster1::> kubectl get pods -o wide
+
+Error: "kubectl" is not a recognized command
+
+cluster1::> volume show -vserver svm1
+Vserver   Volume       Aggregate    State      Type       Size  Available Used%
+--------- ------------ ------------ ---------- ---- ---------- ---------- -----
+svm1      registry     aggr1        online     RW         20GB    18.91GB    5%
+svm1      svm1_root    aggr1        online     RW         20MB    17.53MB   12%
+svm1      trident_default_persistent_volume_claim_storagepool_00c15
+                       aggr1        online     RW          1GB    972.6MB    5%
+svm1      trident_trident
+                       aggr1        online     RW          2GB     1.90GB    5%
+svm1      www          aggr1        online     RW          5GB     4.75GB    5%
+5 entries were displayed.
+
+cluster1::> volume show -vserver svm1 -junction
+                                Junction                            Junction
+Vserver   Volume       Language Active    Junction Path             Path Source
+--------- ------------ -------- --------  ------------------------- -----------
+svm1      registry     C.UTF-8  true      /registry                 RW_volume
+svm1      svm1_root    C.UTF-8  true      /                         -
+svm1      trident_default_persistent_volume_claim_storagepool_00c15
+                       C.UTF-8  true      /trident_default_         RW_volume
+                                          persistent_volume_claim_
+                                          storagepool_00c15
+svm1      trident_trident
+                       C.UTF-8  true      /trident_trident          RW_volume
+svm1      www          C.UTF-8  true      /www                      RW_volume
+5 entries were displayed.
+
+cluster1::> volume show -vserver svm1
+Vserver   Volume       Aggregate    State      Type       Size  Available Used%
+--------- ------------ ------------ ---------- ---- ---------- ---------- -----
+svm1      registry     aggr1        online     RW         20GB    18.91GB    5%
+svm1      svm1_root    aggr1        online     RW         20MB    17.48MB   12%
+svm1      trident_default_persistent_volume_claim_ssd_b0886
+                       aggr2        online     RW          1GB    972.6MB    5%
+svm1      trident_trident
+                       aggr1        online     RW          2GB     1.90GB    5%
+svm1      www          aggr1        online     RW          5GB     4.75GB    5%
+5 entries were displayed.
+
+cluster1::> aggr show
+
+
+Aggregate     Size Available Used% State   #Vols  Nodes            RAID Status
+--------- -------- --------- ----- ------- ------ ---------------- ------------
+aggr0       7.58GB   377.4MB   95% online       1 cluster1-01      raid_dp,
+                                                                   normal
+aggr1      76.73GB   51.44GB   33% online      10 cluster1-01      raid_dp,
+                                                                   normal
+aggr2      38.33GB   38.19GB    0% online       6 cluster1-01      raid_dp,
+                                                                   normal
+3 entries were displayed.
+
+cluster1::> aggr show -aggregate aggr
+    aggr0 aggr1 aggr2
+cluster1::> aggr show -aggregate aggr
+    aggr0 aggr1 aggr2
+
+cluster1::> aggr show -aggregate aggr2
+
+                                         Aggregate: aggr2
+                                      Storage Type: ssd
+                                    Checksum Style: block
+                                   Number Of Disks: 5
+                                            Mirror: false
+                              Disks for First Plex: VMw-1.18, VMw-1.19,
+                                                    VMw-1.20, VMw-1.21,
+                                                    VMw-1.22
+                           Disks for Mirrored Plex: -
+                         Partitions for First Plex: -
+                      Partitions for Mirrored Plex: -
+                                              Node: cluster1-01
+                           Free Space Reallocation: off
+                                         HA Policy: sfo
+                               Ignore Inconsistent: off
+                Space Reserved for Snapshot Copies: -
+           Aggregate Nearly Full Threshold Percent: 95%
+                  Aggregate Full Threshold Percent: 98%
+                             Checksum Verification: on
+                                   RAID Lost Write: on
+                             Enable Thorough Scrub: off
+                                    Hybrid Enabled: false
+Press <space> to page down, <return> for next line, or 'q' to quit... q
+
+cluster1::> aggr show -aggregate aggr2 |grep ssd
+
+Error: "ssd" was not expected. Please specify -fieldname first.
+
+cluster1::> aggr show -aggregate aggr2 -fields Storage Type
+
+Error: "Type" was not expected. Please specify -fieldname first.
+
+cluster1::> aggr show -aggregate aggr2 -fields
+    aggregate                           storage-type
+    chksumstyle                         diskcount
+    mirror                              disklist
+    mirror-disklist                     node
+    free-space-realloc                  ha-policy
+    percent-snapshot-space              space-nearly-full-threshold-percent
+    space-full-threshold-percent        hybrid-enabled
+    availsize                           chksumenabled
+    chksumstatus                        cluster
+    cluster-id                          dr-home-id
+    dr-home-name                        has-mroot
+    has-partner-mroot                   home-id
+    home-name                           hybrid-cache-size-total
+    hybrid                              inconsistent
+    is-home                             maxraidsize
+    cache-raid-group-size               owner-id
+    owner-name                          percent-used
+    plexes                              raidgroups
+    raidstatus                          raidtype
+    resyncsnaptime                      root
+    sis-metadata-space-used             size
+    state                               usedsize
+    uses-shared-disks                   volcount
+    physical-used                       physical-used-percent
+    is-encrypted                        snaplock-type
+    encryption-key-id                   resync-priority
+    data-compaction-space-saved         data-compaction-space-saved-percent
+    data-compacted-count                creation-timestamp
+    single-instance-data-logging        composite
+    composite-capacity-tier-used        sis-space-saved
+    sis-space-saved-percent             sis-shared-count
+
+cluster1::> aggr show -aggregate aggr2 -fields
