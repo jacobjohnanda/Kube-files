@@ -1,0 +1,9 @@
+{
+    "version": 1,
+    "storageDriverName": "ontap-nas",
+    "managementLIF": "10.63.171.70",
+    "svm": "CXE",
+    "username": "ndvp_user",
+    "password": "Netapp123",
+    "storagePrefix": "XLR8"
+}
